@@ -29,6 +29,7 @@
     REF_TYPE(ApplicationStorageDescriptor);
     REF_TYPE(ApplicationUsageDescriptor);
     REF_TYPE(AssociationTagDescriptor);
+    REF_TYPE(AudioPreselectionDescriptor);
     REF_TYPE(AudioStreamDescriptor);
     REF_TYPE(AVCTimingAndHRDDescriptor);
     REF_TYPE(AVCVideoDescriptor);
@@ -100,6 +101,7 @@
     REF_TYPE(PrefetchDescriptor);
     REF_TYPE(PrivateDataIndicatorDescriptor);
     REF_TYPE(PrivateDataSpecifierDescriptor);
+    REF_TYPE(ProtectionMessageDescriptor);
     REF_TYPE(RegistrationDescriptor);
     REF_TYPE(S2SatelliteDeliverySystemDescriptor);
     REF_TYPE(SatelliteDeliverySystemDescriptor);

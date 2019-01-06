@@ -1,7 +1,7 @@
 //----------------------------------------------------------------------------
 //
 // TSDuck - The MPEG Transport Stream Toolkit
-// Copyright (c) 2005-2018, Thierry Lelegard
+// Copyright (c) 2005-2019, Thierry Lelegard
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -70,6 +70,7 @@
 #include "tsAsyncReport.h"
 #include "tsAudioAttributes.h"
 #include "tsAudioLanguageOptions.h"
+#include "tsAudioPreselectionDescriptor.h"
 #include "tsAudioStreamDescriptor.h"
 #include "tsAVCAttributes.h"
 #include "tsAVCHRDParameters.h"
@@ -276,6 +277,7 @@
 #include "tsPrefetchDescriptor.h"
 #include "tsPrivateDataIndicatorDescriptor.h"
 #include "tsPrivateDataSpecifierDescriptor.h"
+#include "tsProtectionMessageDescriptor.h"
 #include "tsPSILogger.h"
 #include "tsPSILoggerArgs.h"
 #include "tsPushInputPlugin.h"

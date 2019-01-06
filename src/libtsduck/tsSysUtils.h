@@ -1,7 +1,7 @@
 //----------------------------------------------------------------------------
 //
 // TSDuck - The MPEG Transport Stream Toolkit
-// Copyright (c) 2005-2018, Thierry Lelegard
+// Copyright (c) 2005-2019, Thierry Lelegard
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -146,6 +146,23 @@ namespace ts {
     //! @return The absolute form of @a path after cleanup.
     //!
     TSDUCKDLL UString AbsoluteFilePath(const UString& path, const UString& base = UString());
+
+    //!
+    //! Build a relative form of a file path, relative to a base directory.
+    //!
+    //! @param [in] path A file path.
+    //! @param [in] base The base directory to use.
+    //! By default, when @a base is empty, the current working directory is used.
+    //! @param [in] caseSensitivity Case sensitivity of file names comparison.
+    //! By default, use the local file system case sensitivity.
+    //! @param [in] portableSlashes If true, the relative path contains forward slashes ('/'),
+    //! even on Windows. The resulting path can be used in relative URL's for instance.
+    //! @return The absolute form of @a path after cleanup.
+    //!
+    TSDUCKDLL UString RelativeFilePath(const UString& path,
+                                       const UString& base = UString(),
+                                       CaseSensitivity caseSensitivity = FileSystemCaseSensitivity,
+                                       bool portableSlashes = false);
 
     //!
     //! Cleanup a file path.

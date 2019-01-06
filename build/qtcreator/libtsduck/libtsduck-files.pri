@@ -45,6 +45,7 @@ HEADERS += \
     ../../../src/libtsduck/tsAsyncReport.h \
     ../../../src/libtsduck/tsAudioAttributes.h \
     ../../../src/libtsduck/tsAudioLanguageOptions.h \
+    ../../../src/libtsduck/tsAudioPreselectionDescriptor.h \
     ../../../src/libtsduck/tsAudioStreamDescriptor.h \
     ../../../src/libtsduck/tsAVCAttributes.h \
     ../../../src/libtsduck/tsAVCHRDParameters.h \
@@ -266,6 +267,7 @@ HEADERS += \
     ../../../src/libtsduck/tsPrefetchDescriptor.h \
     ../../../src/libtsduck/tsPrivateDataIndicatorDescriptor.h \
     ../../../src/libtsduck/tsPrivateDataSpecifierDescriptor.h \
+    ../../../src/libtsduck/tsProtectionMessageDescriptor.h \
     ../../../src/libtsduck/tsPSILogger.h \
     ../../../src/libtsduck/tsPSILoggerArgs.h \
     ../../../src/libtsduck/tsPushInputPlugin.h \
@@ -505,6 +507,7 @@ SOURCES += \
     ../../../src/libtsduck/tsAsyncReport.cpp \
     ../../../src/libtsduck/tsAudioAttributes.cpp \
     ../../../src/libtsduck/tsAudioLanguageOptions.cpp \
+    ../../../src/libtsduck/tsAudioPreselectionDescriptor.cpp \
     ../../../src/libtsduck/tsAudioStreamDescriptor.cpp \
     ../../../src/libtsduck/tsAVCAttributes.cpp \
     ../../../src/libtsduck/tsAVCHRDParameters.cpp \
@@ -684,6 +687,7 @@ SOURCES += \
     ../../../src/libtsduck/tsPrefetchDescriptor.cpp \
     ../../../src/libtsduck/tsPrivateDataIndicatorDescriptor.cpp \
     ../../../src/libtsduck/tsPrivateDataSpecifierDescriptor.cpp \
+    ../../../src/libtsduck/tsProtectionMessageDescriptor.cpp \
     ../../../src/libtsduck/tsPSILogger.cpp \
     ../../../src/libtsduck/tsPSILoggerArgs.cpp \
     ../../../src/libtsduck/tsPushInputPlugin.cpp \

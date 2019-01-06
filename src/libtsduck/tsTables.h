@@ -1,7 +1,7 @@
 //----------------------------------------------------------------------------
 //
 // TSDuck - The MPEG Transport Stream Toolkit
-// Copyright (c) 2005-2018, Thierry Lelegard
+// Copyright (c) 2005-2019, Thierry Lelegard
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -63,6 +63,7 @@
 #include "tsApplicationStorageDescriptor.h"
 #include "tsApplicationUsageDescriptor.h"
 #include "tsAssociationTagDescriptor.h"
+#include "tsAudioPreselectionDescriptor.h"
 #include "tsAudioStreamDescriptor.h"
 #include "tsAVCTimingAndHRDDescriptor.h"
 #include "tsAVCVideoDescriptor.h"
@@ -134,6 +135,7 @@
 #include "tsPrefetchDescriptor.h"
 #include "tsPrivateDataIndicatorDescriptor.h"
 #include "tsPrivateDataSpecifierDescriptor.h"
+#include "tsProtectionMessageDescriptor.h"
 #include "tsRegistrationDescriptor.h"
 #include "tsS2SatelliteDeliverySystemDescriptor.h"
 #include "tsSatelliteDeliverySystemDescriptor.h"
