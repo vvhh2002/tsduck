@@ -15,6 +15,7 @@
     <ClInclude Include="..\..\src\libtsduck\tsAbstractHTTPInputPlugin.h" />
     <ClInclude Include="..\..\src\libtsduck\tsAbstractLongTable.h" />
     <ClInclude Include="..\..\src\libtsduck\tsAbstractMultilingualDescriptor.h" />
+    <ClInclude Include="..\..\src\libtsduck\tsAbstractOutputStream.h" />
     <ClInclude Include="..\..\src\libtsduck\tsAbstractSignalization.h" />
     <ClInclude Include="..\..\src\libtsduck\tsAbstractTable.h" />
     <ClInclude Include="..\..\src\libtsduck\tsAbstractTablePlugin.h" />
@@ -79,6 +80,7 @@
     <ClInclude Include="..\..\src\libtsduck\tsCBC.h" />
     <ClInclude Include="..\..\src\libtsduck\tsCBCTemplate.h" />
     <ClInclude Include="..\..\src\libtsduck\tsCerrReport.h" />
+    <ClInclude Include="..\..\src\libtsduck\tsChannelFile.h" />
     <ClInclude Include="..\..\src\libtsduck\tsCIAncillaryDataDescriptor.h" />
     <ClInclude Include="..\..\src\libtsduck\tsCipherChaining.h" />
     <ClInclude Include="..\..\src\libtsduck\tsCipherChainingTemplate.h" />
@@ -130,6 +132,7 @@
     <ClInclude Include="..\..\src\libtsduck\tsDVBCharsetSingleByte.h" />
     <ClInclude Include="..\..\src\libtsduck\tsDVBCharsetUTF16.h" />
     <ClInclude Include="..\..\src\libtsduck\tsDVBCharsetUTF8.h" />
+    <ClInclude Include="..\..\src\libtsduck\tsDVBCISSA.h" />
     <ClInclude Include="..\..\src\libtsduck\tsDVBCSA2.h" />
     <ClInclude Include="..\..\src\libtsduck\tsDVBHTMLApplicationBoundaryDescriptor.h" />
     <ClInclude Include="..\..\src\libtsduck\tsDVBHTMLApplicationDescriptor.h" />
@@ -173,6 +176,7 @@
     <ClInclude Include="..\..\src\libtsduck\tsHDSimulcastLogicalChannelDescriptor.h" />
     <ClInclude Include="..\..\src\libtsduck\tsHEVCTimingAndHRDDescriptor.h" />
     <ClInclude Include="..\..\src\libtsduck\tsHEVCVideoDescriptor.h" />
+    <ClInclude Include="..\..\src\libtsduck\tsHFBand.h" />
     <ClInclude Include="..\..\src\libtsduck\tsHiDesDevice.h" />
     <ClInclude Include="..\..\src\libtsduck\tsHiDesDeviceInfo.h" />
     <ClInclude Include="..\..\src\libtsduck\tsHierarchyDescriptor.h" />
@@ -226,6 +230,7 @@
     <ClInclude Include="..\..\src\libtsduck\tsMessagePriorityQueueTemplate.h" />
     <ClInclude Include="..\..\src\libtsduck\tsMessageQueue.h" />
     <ClInclude Include="..\..\src\libtsduck\tsMessageQueueTemplate.h" />
+    <ClInclude Include="..\..\src\libtsduck\tsMGT.h" />
     <ClInclude Include="..\..\src\libtsduck\tsMJD.h" />
     <ClInclude Include="..\..\src\libtsduck\tsModulation.h" />
     <ClInclude Include="..\..\src\libtsduck\tsMonotonic.h" />
@@ -257,6 +262,7 @@
     <ClInclude Include="..\..\src\libtsduck\tsPacketDecapsulation.h" />
     <ClInclude Include="..\..\src\libtsduck\tsPacketEncapsulation.h" />
     <ClInclude Include="..\..\src\libtsduck\tsPacketizer.h" />
+    <ClInclude Include="..\..\src\libtsduck\tsPagerArgs.h" />
     <ClInclude Include="..\..\src\libtsduck\tsParentalRatingDescriptor.h" />
     <ClInclude Include="..\..\src\libtsduck\tsPartialTransportStreamDescriptor.h" />
     <ClInclude Include="..\..\src\libtsduck\tsPAT.h" />
@@ -445,7 +451,6 @@
     <ClInclude Include="..\..\src\libtsduck\tsTunerParametersDVBC.h" />
     <ClInclude Include="..\..\src\libtsduck\tsTunerParametersDVBS.h" />
     <ClInclude Include="..\..\src\libtsduck\tsTunerParametersDVBT.h" />
-    <ClInclude Include="..\..\src\libtsduck\tsTunerUtils.h" />
     <ClInclude Include="..\..\src\libtsduck\tsUChar.h" />
     <ClInclude Include="..\..\src\libtsduck\tsUDPReceiver.h" />
     <ClInclude Include="..\..\src\libtsduck\tsUDPSocket.h" />
@@ -511,6 +516,7 @@
     <ClCompile Include="..\..\src\libtsduck\tsAbstractHTTPInputPlugin.cpp" />
     <ClCompile Include="..\..\src\libtsduck\tsAbstractLongTable.cpp" />
     <ClCompile Include="..\..\src\libtsduck\tsAbstractMultilingualDescriptor.cpp" />
+    <ClCompile Include="..\..\src\libtsduck\tsAbstractOutputStream.cpp" />
     <ClCompile Include="..\..\src\libtsduck\tsAbstractSignalization.cpp" />
     <ClCompile Include="..\..\src\libtsduck\tsAbstractTable.cpp" />
     <ClCompile Include="..\..\src\libtsduck\tsAbstractTablePlugin.cpp" />
@@ -563,6 +569,7 @@
     <ClCompile Include="..\..\src\libtsduck\tsCASSelectionArgs.cpp" />
     <ClCompile Include="..\..\src\libtsduck\tsCAT.cpp" />
     <ClCompile Include="..\..\src\libtsduck\tsCerrReport.cpp" />
+    <ClCompile Include="..\..\src\libtsduck\tsChannelFile.cpp" />
     <ClCompile Include="..\..\src\libtsduck\tsCIAncillaryDataDescriptor.cpp" />
     <ClCompile Include="..\..\src\libtsduck\tsCipherChaining.cpp" />
     <ClCompile Include="..\..\src\libtsduck\tsCOM.cpp" />
@@ -602,6 +609,7 @@
     <ClCompile Include="..\..\src\libtsduck\tsDVBCharsetSingleByte.cpp" />
     <ClCompile Include="..\..\src\libtsduck\tsDVBCharsetUTF16.cpp" />
     <ClCompile Include="..\..\src\libtsduck\tsDVBCharsetUTF8.cpp" />
+    <ClCompile Include="..\..\src\libtsduck\tsDVBCISSA.cpp" />
     <ClCompile Include="..\..\src\libtsduck\tsDVBCSA2.cpp" />
     <ClCompile Include="..\..\src\libtsduck\tsDVBHTMLApplicationBoundaryDescriptor.cpp" />
     <ClCompile Include="..\..\src\libtsduck\tsDVBHTMLApplicationDescriptor.cpp" />
@@ -639,6 +647,7 @@
     <ClCompile Include="..\..\src\libtsduck\tsHDSimulcastLogicalChannelDescriptor.cpp" />
     <ClCompile Include="..\..\src\libtsduck\tsHEVCTimingAndHRDDescriptor.cpp" />
     <ClCompile Include="..\..\src\libtsduck\tsHEVCVideoDescriptor.cpp" />
+    <ClCompile Include="..\..\src\libtsduck\tsHFBand.cpp" />
     <ClCompile Include="..\..\src\libtsduck\tsHiDesDeviceInfo.cpp" />
     <ClCompile Include="..\..\src\libtsduck\tsHierarchyDescriptor.cpp" />
     <ClCompile Include="..\..\src\libtsduck\tshls.cpp" />
@@ -685,6 +694,7 @@
     <ClCompile Include="..\..\src\libtsduck\tsMD5.cpp" />
     <ClCompile Include="..\..\src\libtsduck\tsMemoryUtils.cpp" />
     <ClCompile Include="..\..\src\libtsduck\tsMessageDescriptor.cpp" />
+    <ClCompile Include="..\..\src\libtsduck\tsMGT.cpp" />
     <ClCompile Include="..\..\src\libtsduck\tsMJD.cpp" />
     <ClCompile Include="..\..\src\libtsduck\tsModulation.cpp" />
     <ClCompile Include="..\..\src\libtsduck\tsMonotonic.cpp" />
@@ -716,6 +726,7 @@
     <ClCompile Include="..\..\src\libtsduck\tsPacketDecapsulation.cpp" />
     <ClCompile Include="..\..\src\libtsduck\tsPacketEncapsulation.cpp" />
     <ClCompile Include="..\..\src\libtsduck\tsPacketizer.cpp" />
+    <ClCompile Include="..\..\src\libtsduck\tsPagerArgs.cpp" />
     <ClCompile Include="..\..\src\libtsduck\tsParentalRatingDescriptor.cpp" />
     <ClCompile Include="..\..\src\libtsduck\tsPartialTransportStreamDescriptor.cpp" />
     <ClCompile Include="..\..\src\libtsduck\tsPAT.cpp" />
@@ -883,7 +894,6 @@
     <ClCompile Include="..\..\src\libtsduck\tsTunerParametersDVBC.cpp" />
     <ClCompile Include="..\..\src\libtsduck\tsTunerParametersDVBS.cpp" />
     <ClCompile Include="..\..\src\libtsduck\tsTunerParametersDVBT.cpp" />
-    <ClCompile Include="..\..\src\libtsduck\tsTunerUtils.cpp" />
     <ClCompile Include="..\..\src\libtsduck\tsUChar.cpp" />
     <ClCompile Include="..\..\src\libtsduck\tsUDPReceiver.cpp" />
     <ClCompile Include="..\..\src\libtsduck\tsUDPSocket.cpp" />

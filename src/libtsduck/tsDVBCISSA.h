@@ -28,48 +28,38 @@
 //----------------------------------------------------------------------------
 //!
 //!  @file
-//!  @ingroup hardware
-//!  Some utilities for DVB tuners
+//!  DVB-CISSA AES-based TS packet encryption.
 //!
 //----------------------------------------------------------------------------
 
 #pragma once
-#include "tsTunerParameters.h"
-#include "tsDescriptor.h"
-#include "tsCerrReport.h"
+#include "tsCBC.h"
+#include "tsAES.h"
 
 namespace ts {
     //!
-    //! Get DVB tuner parameters from a Linux zap configuration file.
+    //! DVB-CISSA AES-based TS packet encryption.
+    //! (CISSA = Common IPTV Software-oriented Scrambling Algorithm).
+    //! @ingroup crypto
+    //! @see ETSI TS 103 127, chapter 6
     //!
-    //! This method reads a Linux zap configuration file, locate a channel
-    //! description and sets the TunerParameters to the values for this
-    //! channel's transponder.
-    //!
-    //! Since Linux zap configuration files are text files, they can be
-    //! used on any platform, although they are usually generated on Linux.
-    //!
-    //! @param [in] channel_name Name of the TV channel to search.
-    //! @param [in] file_name Name of the file to read.
-    //! @param [out] parameters Returned tuner parameters.
-    //! @param [in,out] report Where to report errors.
-    //! @return True on success, false on error.
-    //!
-    TSDUCKDLL bool GetTunerFromZapFile(const UString& channel_name,
-                                       const UString& file_name,
-                                       TunerParameters& parameters,
-                                       Report& report = CERR);
+    class TSDUCKDLL DVBCISSA : public CBC<AES>
+    {
+    public:
+        //!
+        //! DVB-CISSA control words size in bytes (AES-128 key size).
+        //!
+        static const size_t KEY_SIZE = 16;
 
-    //!
-    //! Get DVB tuner parameters from a delivery system descriptor.
-    //!
-    //! This method analyzes a delivery system descriptor (satellite,
-    //! cable or terrestrial) and returns a new tuner parameters object.
-    //!
-    //! @param [in] desc A descriptor. Must be a valid delivery system descriptor.
-    //! @return A newly allocated tuner parameters object of the appropriate class.
-    //! Return 0 if the descriptor was not correctly analyzed or is not
-    //! a delivery system descriptor.
-    //!
-    TSDUCKDLL TunerParameters* DecodeDeliveryDescriptor(const Descriptor& desc);
+        //!
+        //! Constructor.
+        //!
+        DVBCISSA();
+
+        // Implementation of BlockCipher interface.
+        virtual UString name() const override;
+
+    private:
+        virtual bool setIV(const void* iv_, size_t iv_length) override;
+    };
 }
