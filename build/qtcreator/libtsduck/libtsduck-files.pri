@@ -5,6 +5,7 @@ HEADERS += \
     ../../../src/libtsduck/tsAbstractAVCAccessUnit.h \
     ../../../src/libtsduck/tsAbstractAVCData.h \
     ../../../src/libtsduck/tsAbstractAVCStructure.h \
+    ../../../src/libtsduck/tsAbstractDefinedByStandards.h \
     ../../../src/libtsduck/tsAbstractDeliverySystemDescriptor.h \
     ../../../src/libtsduck/tsAbstractDemux.h \
     ../../../src/libtsduck/tsAbstractDescrambler.h \
@@ -89,6 +90,7 @@ HEADERS += \
     ../../../src/libtsduck/tsConfigSection.h \
     ../../../src/libtsduck/tsConfigSectionTemplate.h \
     ../../../src/libtsduck/tsContentDescriptor.h \
+    ../../../src/libtsduck/tsContinuityAnalyzer.h \
     ../../../src/libtsduck/tsCopyrightDescriptor.h \
     ../../../src/libtsduck/tsCountryAvailabilityDescriptor.h \
     ../../../src/libtsduck/tsCPDescriptor.h \
@@ -103,6 +105,7 @@ HEADERS += \
     ../../../src/libtsduck/tsCTS4.h \
     ../../../src/libtsduck/tsCTS4Template.h \
     ../../../src/libtsduck/tsCueIdentifierDescriptor.h \
+    ../../../src/libtsduck/tsCVCT.h \
     ../../../src/libtsduck/tsCyclingPacketizer.h \
     ../../../src/libtsduck/tsDataBroadcastDescriptor.h \
     ../../../src/libtsduck/tsDataBroadcastIdDescriptor.h \
@@ -449,6 +452,7 @@ HEADERS += \
     ../../../src/libtsduck/tsTunerParametersDVBC.h \
     ../../../src/libtsduck/tsTunerParametersDVBS.h \
     ../../../src/libtsduck/tsTunerParametersDVBT.h \
+    ../../../src/libtsduck/tsTVCT.h \
     ../../../src/libtsduck/tsUChar.h \
     ../../../src/libtsduck/tsUDPReceiver.h \
     ../../../src/libtsduck/tsUDPSocket.h \
@@ -460,6 +464,7 @@ HEADERS += \
     ../../../src/libtsduck/tsVariableTemplate.h \
     ../../../src/libtsduck/tsVBIDataDescriptor.h \
     ../../../src/libtsduck/tsVBITeletextDescriptor.h \
+    ../../../src/libtsduck/tsVCT.h \
     ../../../src/libtsduck/tsVersion.h \
     ../../../src/libtsduck/tsVersionInfo.h \
     ../../../src/libtsduck/tsVersionString.h \
@@ -496,6 +501,7 @@ SOURCES += \
     ../../../src/libtsduck/tsAbstractAVCAccessUnit.cpp \
     ../../../src/libtsduck/tsAbstractAVCData.cpp \
     ../../../src/libtsduck/tsAbstractAVCStructure.cpp \
+    ../../../src/libtsduck/tsAbstractDefinedByStandards.cpp \
     ../../../src/libtsduck/tsAbstractDeliverySystemDescriptor.cpp \
     ../../../src/libtsduck/tsAbstractDemux.cpp \
     ../../../src/libtsduck/tsAbstractDescrambler.cpp \
@@ -566,12 +572,14 @@ SOURCES += \
     ../../../src/libtsduck/tsConfigFile.cpp \
     ../../../src/libtsduck/tsConfigSection.cpp \
     ../../../src/libtsduck/tsContentDescriptor.cpp \
+    ../../../src/libtsduck/tsContinuityAnalyzer.cpp \
     ../../../src/libtsduck/tsCopyrightDescriptor.cpp \
     ../../../src/libtsduck/tsCountryAvailabilityDescriptor.cpp \
     ../../../src/libtsduck/tsCPDescriptor.cpp \
     ../../../src/libtsduck/tsCPIdentifierDescriptor.cpp \
     ../../../src/libtsduck/tsCRC32.cpp \
     ../../../src/libtsduck/tsCueIdentifierDescriptor.cpp \
+    ../../../src/libtsduck/tsCVCT.cpp \
     ../../../src/libtsduck/tsCyclingPacketizer.cpp \
     ../../../src/libtsduck/tsDataBroadcastDescriptor.cpp \
     ../../../src/libtsduck/tsDataBroadcastIdDescriptor.cpp \
@@ -882,6 +890,7 @@ SOURCES += \
     ../../../src/libtsduck/tsTunerParametersDVBC.cpp \
     ../../../src/libtsduck/tsTunerParametersDVBS.cpp \
     ../../../src/libtsduck/tsTunerParametersDVBT.cpp \
+    ../../../src/libtsduck/tsTVCT.cpp \
     ../../../src/libtsduck/tsUChar.cpp \
     ../../../src/libtsduck/tsUDPReceiver.cpp \
     ../../../src/libtsduck/tsUDPSocket.cpp \
@@ -890,6 +899,7 @@ SOURCES += \
     ../../../src/libtsduck/tsUString.cpp \
     ../../../src/libtsduck/tsVBIDataDescriptor.cpp \
     ../../../src/libtsduck/tsVBITeletextDescriptor.cpp \
+    ../../../src/libtsduck/tsVCT.cpp \
     ../../../src/libtsduck/tsVersionInfo.cpp \
     ../../../src/libtsduck/tsVideoAttributes.cpp \
     ../../../src/libtsduck/tsVideoStreamDescriptor.cpp \

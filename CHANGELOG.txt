@@ -2,7 +2,7 @@ TSDUCK CHANGE LOG AND RELEASE NOTES
 
 -------------------------------------------------------------------------------
 
-VERSION 3.17-1151
+VERSION 3.17-1189
 
 [IMP] Improvements on existing commands and plugins:
 
@@ -12,30 +12,50 @@ VERSION 3.17-1151
   * In the input plugin "hls", after loading a master playlist, if the selected
     media playlist is not found, try next one, etc.
   * Added option --evaluate-pcr-offset to plugin "pcrextract".
-  * The old "zap" format which was inherited from some Linux scanning tools is
-    no longer supported by TSDuck. Instead, a more generic and portable XML
-    format is used. See the user's guide for more details. As a consequence:
-    . In plugin "dvb" and command "tsscan": Added option --tuning-file,
-      removed options --tune and --zap-config-file.
-    . In plugin "nitscan" and command "tsscan", added options --save-channels
-      and --update-channels.
-  * In plugin "dvb" and command "tsscan": Added --guard-interval values
-    "1/128", "19/128", "19/256". Added --transmission-mode values "1K",
-    "2K-interleaved", "4K-interleaved", "16K", "32K". Added --modulation
-    values "16-APSK", "32-APSK" (DVB-S2).
   * Added option --dvb-cissa to plugins "scrambler" and "descrambler".
-  * Added region-specific UHF/VHF frequency layouts in various commands and
-    plugins. Added option --hf-band-region to plugins "dvb", "dektec" and
-    commands "tsterinfo", "tsscan". Added option --default-region to command
-    "tsterinfo".
-  * The command "tsscan" can now perform VHF band scanning (option --vhf-band).
-    Offsets are no longer used by default, added options --use-offsets.
+  * Added options --pid and --tag to plugin "bitrate_monitor". The plugin can
+    now also monitor the bitrate of the complete TS and can detect zero bitrate
+    on the transport stream.
+  * Added option --start-media-sequence to output plugin "hls".
+  * Added option --pack-and-flush to "tstabcomp".
+  * In various analysis commands and plugins, ATSC signalization is now known.
+  * General list of improvements regarding tuners and scanning:
+    - Added region-specific UHF/VHF frequency layouts in various commands and
+      plugins. Added option --hf-band-region to plugins "dvb", "dektec" and
+      commands "tsterinfo", "tsscan". Added option --default-region to command
+      "tsterinfo".
+    - The command "tsscan" can now perform VHF band scanning: added option
+      --vhf-band. Offsets are no longer used by default: added option
+      --use-offsets.
+    - In plugin "dvb" and command "tsscan": Added --guard-interval values
+      "1/128", "19/128", "19/256". Added --transmission-mode values "1K",
+      "2K-interleaved", "4K-interleaved", "16K", "32K". Added --modulation
+      values "16-APSK", "32-APSK" (DVB-S2). The option --channel-transponder
+      now accepts ATSC channel ids (major.minor).
+    - The old "zap" format which was inherited from some Linux scanning tools
+      is no longer supported by TSDuck. Instead, a more generic and portable
+      XML format is used. See the user's guide for more details. Impact:
+      . In plugin "dvb" and command "tsscan": Added option --tuning-file,
+        removed options --tune and --zap-config-file.
+      . In plugin "nitscan" and command "tsscan", added options --save-channels
+        and --update-channels.
 
 [BUG] Bug fixes:
 
   * Fixed support for ATSC tuners on Windows.
   * In plugin "scrambler", fixed a crypto-period issue with option --cw-file
     and more than one CW.
+  * Now accept to demux probably incorrect section muxing when a TS packet is
+    such that 1) PUSI is set, 2) start of payload before the pointer field is
+    unused (do not contain a valid section) and 3) starts with FF. This is a
+    probably incorrect muxing which has been found on at least one satellite
+    transponder.
+  * Fixed bitrate computation based on PCR's. Null packets uselessly reset the
+    bitrate computation and introduced a small bias. New computed values can be
+    slightly different but more accurate.
+  * Fixed various discrepancies in adjustment of continuity counters.
+  * The option --default-charset was not always correctly used when compiling
+    tables from XML.
 
 -------------------------------------------------------------------------------
 

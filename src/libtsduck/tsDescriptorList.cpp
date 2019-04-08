@@ -99,19 +99,14 @@ bool ts::DescriptorList::operator==(const DescriptorList& other) const
 // Get the default Private Data Specified value in this descriptor list.
 //----------------------------------------------------------------------------
 
-ts::PDS ts::DescriptorList::defaultPDS() const
+ts::PDS ts::DescriptorList::defaultPDS(PDS pds) const
 {
-    if (_table == nullptr) {
-        // Unknown table, assume DVB rules.
-        return 0;
-    }
-    else if ((_table->standards() & STD_ATSC) != 0) {
+    if (pds == 0 && _table != nullptr && ((_table->definingStandards() | _table->allStandards()) & STD_ATSC) != 0) {
         // Use fake PDS for ATSC descriptors.
         return PDS_ATSC;
     }
     else {
-        // Assume DVB rules.
-        return 0;
+        return pds;
     }
 }
 
@@ -128,7 +123,7 @@ void ts::DescriptorList::add(const DescriptorPtr& desc)
     if (desc->tag() == DID_PRIV_DATA_SPECIF) {
         // This descriptor defines a new "private data specifier".
         // The PDS is the only thing in the descriptor payload.
-        pds = desc->payloadSize() < 4 ? 0 : GetUInt32(desc->payload());
+        pds = defaultPDS(desc->payloadSize() < 4 ? 0 : GetUInt32(desc->payload()));
     }
     else if (_list.empty()) {
         // First descriptor in the list
@@ -363,9 +358,12 @@ size_t ts::DescriptorList::serialize(ByteBlock& bb, size_t start) const
 // Same as Serialize, but prepend a 2-byte length field before the list.
 //----------------------------------------------------------------------------
 
-size_t ts::DescriptorList::lengthSerialize(uint8_t*& addr, size_t& size, size_t start, uint8_t reserved_bits) const
+size_t ts::DescriptorList::lengthSerialize(uint8_t*& addr, size_t& size, size_t start, uint16_t reserved_bits, size_t length_bits) const
 {
-    assert (size >= 2);
+    assert(size >= 2);
+
+    // Not more than 16 bits in the length field.
+    length_bits = std::min<size_t>(length_bits, 16);
 
     // Reserve space for descriptor list length
     uint8_t* length_addr = addr;
@@ -373,11 +371,11 @@ size_t ts::DescriptorList::lengthSerialize(uint8_t*& addr, size_t& size, size_t 
     size -= 2;
 
     // Insert descriptor list
-    size_t result (serialize(addr, size, start));
+    size_t result = serialize(addr, size, start);
 
     // Update length
-    size_t length (addr - length_addr - 2);
-    PutUInt16 (length_addr, uint16_t (length | (uint16_t(reserved_bits) << 12)));
+    size_t length = addr - length_addr - 2;
+    PutUInt16(length_addr, uint16_t(length | (reserved_bits << length_bits)));
 
     return result;
 }
@@ -542,10 +540,10 @@ bool ts::DescriptorList::fromXML(xml::ElementVector& others, const xml::Element*
     return fromXML(others, parent, allowed, charset);
 }
 
-bool ts::DescriptorList::fromXML(const xml::Element* parent)
+bool ts::DescriptorList::fromXML(const xml::Element* parent, const DVBCharset* charset)
 {
     xml::ElementVector others;
-    return fromXML(others, parent, UStringList());
+    return fromXML(others, parent, UStringList(), charset);
 }
 
 bool ts::DescriptorList::fromXML(xml::ElementVector& others, const xml::Element* parent, const UStringList& allowedOthers, const DVBCharset* charset)

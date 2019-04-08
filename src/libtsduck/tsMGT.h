@@ -107,11 +107,21 @@ namespace ts {
         MGT& operator=(const MGT& other) = default;
 
         // Inherited methods
-        virtual void serialize(BinaryTable& table, const DVBCharset* = nullptr) const override;
-        virtual void deserialize(const BinaryTable& table, const DVBCharset* = nullptr) override;
-        virtual void buildXML(xml::Element*) const override;
-        virtual void fromXML(const xml::Element*) override;
+        virtual void fromXML(const xml::Element*, const DVBCharset* = nullptr) override;
         DeclareDisplaySection();
+
+        //!
+        //! Get the name for a 16-bit table type from an MGT.
+        //! @param [in] table_type Table type value.
+        //! @return The corresponding name.
+        //!
+        static UString TableTypeName(uint16_t table_type);
+
+    protected:
+        // Inherited methods
+        virtual void serializeContent(BinaryTable&, const DVBCharset*) const override;
+        virtual void deserializeContent(const BinaryTable&, const DVBCharset*) override;
+        virtual void buildXML(xml::Element*) const override;
 
     private:
         // An Enumeration object for table_type.
