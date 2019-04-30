@@ -233,9 +233,12 @@ bool ts::CreateTuneRequest(ComPtr<::ITuneRequest>& request, ::ITuningSpace* tuni
     }
     assert(!tune_request.isNull());
 
+    // Report to use when errors shall be reported in debug mode only
+    Report& debug_report(report.debug() ? report : NULLREP);
+
     // If this is a DVB tuning space, get DVB interface of tune request and set ids to wildcards.
     ComPtr<::IDVBTuneRequest> dvb_request;
-    dvb_request.queryInterface(tune_request.pointer(), ::IID_IDVBTuneRequest, report);
+    dvb_request.queryInterface(tune_request.pointer(), ::IID_IDVBTuneRequest, debug_report);
     if (!dvb_request.isNull() &&
         (!PUT(dvb_request, ONID, -1) ||
          !PUT(dvb_request, TSID, -1) ||
@@ -247,7 +250,7 @@ bool ts::CreateTuneRequest(ComPtr<::ITuneRequest>& request, ::ITuningSpace* tuni
     // If this is an ATSC tuning space, get ATSC interface of tune request and set channel and
     // minor channel to wildcards.
     ComPtr<::IATSCChannelTuneRequest> atsc_request;
-    atsc_request.queryInterface(tune_request.pointer(), ::IID_IATSCChannelTuneRequest, report);
+    atsc_request.queryInterface(tune_request.pointer(), ::IID_IATSCChannelTuneRequest, debug_report);
     if (!atsc_request.isNull() &&
         (!PUT(atsc_request, Channel, -1) ||
          !PUT(atsc_request, MinorChannel, -1)))
@@ -470,8 +473,8 @@ bool ts::CreateLocatorATSC(ComPtr<::IDigitalLocator>& locator, const TunerParame
     // we need to take the frequency and map it to the corresponding HF channel
     // using the global HF band region.
 
-    const HFBandPtr uhf(HFBand::Factory(u"", HFBand::UHF));
-    const HFBandPtr vhf(HFBand::Factory(u"", HFBand::VHF));
+    const HFBand* uhf = HFBand::GetBand(u"", HFBand::UHF);
+    const HFBand* vhf = HFBand::GetBand(u"", HFBand::VHF);
     long physical_channel;
     if (uhf->inBand(params.frequency)) {
         physical_channel = uhf->channelNumber(params.frequency);

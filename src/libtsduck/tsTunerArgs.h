@@ -35,7 +35,7 @@
 #pragma once
 #include "tsArgs.h"
 #include "tsTunerParameters.h"
-#include "tsHFBand.h"
+#include "tsDuckContext.h"
 #include "tsVariable.h"
 #include "tsModulation.h"
 #include "tsLNB.h"
@@ -84,8 +84,6 @@ namespace ts {
         Variable<Pilot>             pilots;             //!< Presence of pilots (DVB-S2 only).
         Variable<RollOff>           roll_off;           //!< Roll-off factor (DVB-S2 only).
         Variable<PLP>               plp;                //!< PLP identification (DVB-T2 only).
-        HFBandPtr                   uhf;                //!< Local UHF band description.
-        HFBandPtr                   vhf;                //!< Local VHF band description.
 
         //!
         //! Default constructor.
@@ -93,6 +91,23 @@ namespace ts {
         //! @param [in] allow_short_options If true, allow short one-letter options.
         //!
         TunerArgs(bool info_only = false, bool allow_short_options = true);
+
+        //!
+        //! Copy constructor.
+        //! Use default implementation, just tell the compiler we understand
+        //! the consequences of copying a pointer member.
+        //! @param [in] other The other instance to copy.
+        //!
+        TunerArgs(const TunerArgs& other) = default;
+
+        //!
+        //! Assignment operator.
+        //! Use default implementation, just tell the compiler we understand
+        //! the consequences of copying a pointer member.
+        //! @param [in] other The other instance to copy.
+        //! @return A reference to this object.
+        //!
+        TunerArgs& operator=(const TunerArgs& other) = default;
 
         //!
         //! Check if actual tuning information is set.
@@ -118,8 +133,10 @@ namespace ts {
         //! Load arguments from command line.
         //! Args error indicator is set in case of incorrect arguments.
         //! @param [in,out] args Command line arguments.
+        //! @param [in,out] duck TSDuck execution context.
+        //! Required to convert UHF/VHF channels to frequency.
         //!
-        void load(Args& args);
+        void load(Args& args, DuckContext& duck);
 
         //!
         //! Open a tuner and configure it according to the parameters in this object.

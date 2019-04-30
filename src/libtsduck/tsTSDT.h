@@ -52,10 +52,10 @@ namespace ts {
 
         //!
         //! Constructor from a binary table.
+        //! @param [in,out] duck TSDuck execution context.
         //! @param [in] table Binary table to deserialize.
-        //! @param [in] charset If not zero, character set to use without explicit table code.
         //!
-        TSDT(const BinaryTable& table, const DVBCharset* charset = nullptr);
+        TSDT(DuckContext& duck, const BinaryTable& table);
 
         //!
         //! Copy constructor.

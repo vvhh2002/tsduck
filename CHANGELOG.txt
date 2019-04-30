@@ -2,6 +2,26 @@ TSDUCK CHANGE LOG AND RELEASE NOTES
 
 -------------------------------------------------------------------------------
 
+VERSION 3.18-1210
+
+[NEW] New commands and plugins:
+
+  * Added input plugin "craft" to build specifically crafted packets.
+
+[IMP] Improvements on existing commands and plugins:
+
+  * Added option --atsc to commands "tsanalyze", "tstables", "tspsi",
+    "tstabdump", "tstabcomp" and plugins "analyze", "tables", "psi".
+
+[BUG] Bug fixes:
+
+  * Fixed an issue while reading XML files: leading and trailing spaces were
+    removed by default inside all text nodes.
+  * Fixed input plugin "dektec": with satellite receivers, the LNB was not
+    properly enabled.
+
+-------------------------------------------------------------------------------
+
 VERSION 3.17-1189
 
 [IMP] Improvements on existing commands and plugins:
