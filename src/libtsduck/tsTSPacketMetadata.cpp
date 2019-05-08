@@ -26,85 +26,62 @@
 // THE POSSIBILITY OF SUCH DAMAGE.
 //
 //----------------------------------------------------------------------------
-//
-//  Transport stream processor shared library:
-//  Skip leading TS packets of a stream.
-//
-//----------------------------------------------------------------------------
 
-#include "tsPlugin.h"
-#include "tsPluginRepository.h"
+#include "tsTSPacketMetadata.h"
 TSDUCK_SOURCE;
 
-
-//----------------------------------------------------------------------------
-// Plugin definition
-//----------------------------------------------------------------------------
-
-namespace ts {
-    class SkipPlugin: public ProcessorPlugin
-    {
-    public:
-        // Implementation of plugin API
-        SkipPlugin(TSP*);
-        virtual bool start() override;
-        virtual Status processPacket(TSPacket&, TSPacketMetadata&) override;
-
-    private:
-        PacketCounter skip_count;
-        bool          use_stuffing;
-
-        // Inaccessible operations
-        SkipPlugin() = delete;
-        SkipPlugin(const SkipPlugin&) = delete;
-        SkipPlugin& operator=(const SkipPlugin&) = delete;
-    };
-}
-
-TSPLUGIN_DECLARE_VERSION
-TSPLUGIN_DECLARE_PROCESSOR(skip, ts::SkipPlugin)
+const ts::TSPacketMetadata::LabelSet ts::TSPacketMetadata::NoLabel;
+const ts::TSPacketMetadata::LabelSet ts::TSPacketMetadata::AllLabels(~NoLabel);
 
 
 //----------------------------------------------------------------------------
-// Constructor
+// Constructor.
 //----------------------------------------------------------------------------
 
-ts::SkipPlugin::SkipPlugin(TSP* tsp_) :
-    ProcessorPlugin(tsp_, u"Skip leading TS packets of a stream", u"[options] count"),
-    skip_count(0),
-    use_stuffing(false)
+ts::TSPacketMetadata::TSPacketMetadata() :
+    _labels(),
+    _flush(false),
+    _bitrate_changed(false),
+    _input_stuffing(false),
+    _nullified(false)
 {
-    option(u"", 0, UNSIGNED, 1, 1);
-    help(u"", u"Number of leading packets to skip.");
-
-    option(u"stuffing", 's');
-    help(u"stuffing", u"Replace excluded leading packets with stuffing (null packets) instead of removing them.\n");
 }
 
 
 //----------------------------------------------------------------------------
-// Start method
+// Reset the content of this instance.
 //----------------------------------------------------------------------------
 
-bool ts::SkipPlugin::start()
+void ts::TSPacketMetadata::reset()
 {
-    skip_count = intValue<PacketCounter>();
-    use_stuffing = present(u"stuffing");
-    return true;
+    _labels.reset();
+    _flush = false;
+    _bitrate_changed = false;
+    _input_stuffing = false;
+    _nullified = false;
 }
 
 
 //----------------------------------------------------------------------------
-// Packet processing method
+// Label operations
 //----------------------------------------------------------------------------
 
-ts::ProcessorPlugin::Status ts::SkipPlugin::processPacket(TSPacket& pkt, TSPacketMetadata& pkt_data)
+bool ts::TSPacketMetadata::hasAnyLabel(const LabelSet& mask) const
 {
-    if (skip_count == 0) {
-        return TSP_OK;
-    }
-    else {
-        skip_count--;
-        return use_stuffing ? TSP_NULL : TSP_DROP;
-    }
+    return (_labels & mask).any(); 
+}
+
+bool ts::TSPacketMetadata::hasAllLabels(const LabelSet& mask) const
+{
+    return (_labels & mask) == mask; 
+}
+
+void ts::TSPacketMetadata::setLabels(const LabelSet& mask)
+{
+    _labels |= mask;
+}
+
+void ts::TSPacketMetadata::clearLabels(const LabelSet& mask)
+{
+    _labels &= ~mask;
 }

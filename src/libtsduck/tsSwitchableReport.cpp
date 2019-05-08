@@ -26,85 +26,42 @@
 // THE POSSIBILITY OF SUCH DAMAGE.
 //
 //----------------------------------------------------------------------------
-//
-//  Transport stream processor shared library:
-//  Skip leading TS packets of a stream.
-//
-//----------------------------------------------------------------------------
 
-#include "tsPlugin.h"
-#include "tsPluginRepository.h"
+#include "tsSwitchableReport.h"
 TSDUCK_SOURCE;
-
-
-//----------------------------------------------------------------------------
-// Plugin definition
-//----------------------------------------------------------------------------
-
-namespace ts {
-    class SkipPlugin: public ProcessorPlugin
-    {
-    public:
-        // Implementation of plugin API
-        SkipPlugin(TSP*);
-        virtual bool start() override;
-        virtual Status processPacket(TSPacket&, TSPacketMetadata&) override;
-
-    private:
-        PacketCounter skip_count;
-        bool          use_stuffing;
-
-        // Inaccessible operations
-        SkipPlugin() = delete;
-        SkipPlugin(const SkipPlugin&) = delete;
-        SkipPlugin& operator=(const SkipPlugin&) = delete;
-    };
-}
-
-TSPLUGIN_DECLARE_VERSION
-TSPLUGIN_DECLARE_PROCESSOR(skip, ts::SkipPlugin)
 
 
 //----------------------------------------------------------------------------
 // Constructor
 //----------------------------------------------------------------------------
 
-ts::SkipPlugin::SkipPlugin(TSP* tsp_) :
-    ProcessorPlugin(tsp_, u"Skip leading TS packets of a stream", u"[options] count"),
-    skip_count(0),
-    use_stuffing(false)
+ts::SwitchableReport::SwitchableReport(Report& delegate, bool on) :
+    Report(std::numeric_limits<int>::max()), // actual logging will be limited in delegate
+    _on(on),
+    _delegate(delegate)
 {
-    option(u"", 0, UNSIGNED, 1, 1);
-    help(u"", u"Number of leading packets to skip.");
-
-    option(u"stuffing", 's');
-    help(u"stuffing", u"Replace excluded leading packets with stuffing (null packets) instead of removing them.\n");
 }
 
 
 //----------------------------------------------------------------------------
-// Start method
+// Set the switch state of this object.
 //----------------------------------------------------------------------------
 
-bool ts::SkipPlugin::start()
+void ts::SwitchableReport::setSwitch(bool on)
 {
-    skip_count = intValue<PacketCounter>();
-    use_stuffing = present(u"stuffing");
-    return true;
+    // Volatile boolean.
+    _on = on;
+    MemoryBarrier();
 }
 
 
 //----------------------------------------------------------------------------
-// Packet processing method
+// Message logging method.
 //----------------------------------------------------------------------------
 
-ts::ProcessorPlugin::Status ts::SkipPlugin::processPacket(TSPacket& pkt, TSPacketMetadata& pkt_data)
+void ts::SwitchableReport::writeLog(int severity, const UString &msg)
 {
-    if (skip_count == 0) {
-        return TSP_OK;
-    }
-    else {
-        skip_count--;
-        return use_stuffing ? TSP_NULL : TSP_DROP;
+    if (_on) {
+        _delegate.log(severity, msg);
     }
 }
