@@ -2,19 +2,20 @@ TSDUCK CHANGE LOG AND RELEASE NOTES
 
 -------------------------------------------------------------------------------
 
-VERSION 3.18-1233
+VERSION 3.18-1247
 
 [NEW] New commands and plugins:
 
-  * Added input plugin "craft" to build specifically crafted packets.
+  * Added plugin "craft" as input to build specifically crafted packets and as
+    packet processor to similarly alter packets in transit.
 
 [IMP] Improvements on existing commands and plugins:
 
   * Added option --only-label to all packet processing plugins. There is a
     new possibility to mark individual packets with a label which can be
     reused in other plugins.
-  * Added options --label, --set-label, --nullified, --input-stuffing, --every
-    to plugin "filter".
+  * Added options --label, --set-label, --reset-label, --nullified,
+    --input-stuffing, --every to plugin "filter".
   * Added option --atsc to commands "tsanalyze", "tstables", "tspsi",
     "tstabdump", "tstabcomp" and plugins "analyze", "tables", "psi".
   * Added option --pes-offset to plugin "encap" (synchronous PES mode).
