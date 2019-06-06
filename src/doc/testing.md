@@ -26,8 +26,9 @@ and a collection of small command line tools and plugins.
 
 Similarly, the tests for TSDuck are divided in two parts.
 
-- The TSDuck library has its own unitary test suite based on CppUnit. This test suite is part of
-  the [main tsduck](https://github.com/tsduck/tsduck) repository for TSDuck in directory `src/utest`.
+- The TSDuck library has its own unitary test suite based on a custom framework named "TSUnit".
+  This test suite is part of the [main tsduck](https://github.com/tsduck/tsduck) repository
+  for TSDuck in directory `src/utest`.
 
 - The tools and plugins are less easy to test. They work on large transport stream files which
   would clutter the tsduck repository. The repository [tsduck-test](https://github.com/tsduck/tsduck-test)
@@ -39,7 +40,8 @@ The two test suites are fully automated.
 
 In the main TSDuck repository, the directory `src/utest` contains the source file for
 one single program named `utest`. This program is divided in many source files (or test suites).
-Each source file contains many unitary tests. The test infrastructure is based on CppUnit.
+Each source file contains many unitary tests. The test infrastructure is based on a custom
+framework named "TSUnit".
 
 The `utest` executable is built twice, once using the TSDuck shared library and once using
 the static library. On UNIX systems, both versions of the test suite are built and run using
@@ -73,13 +75,13 @@ On Windows, the Visual Studio project builds two executables named
 manually or from Vidual Studio:
 
 ~~~~
-D:\Devel\tsduck> build\msvc2017\Release-x64\utests-tsduckdll.exe
+D:\Devel\tsduck> build\msvc\Release-x64\utests-tsduckdll.exe
 
 
 OK (311 tests)
 
 
-D:\Devel\tsduck> build\msvc2017\Release-x64\utests-tsducklib.exe
+D:\Devel\tsduck> build\msvc\Release-x64\utests-tsducklib.exe
 
 
 OK (308 tests)
