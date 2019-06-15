@@ -47,6 +47,7 @@ namespace utest {
     //!
     class TSUnitThread : public ts::Thread
     {
+        TS_NOCOPY(TSUnitThread);
     public:
         //!
         //! Default constructor.

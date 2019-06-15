@@ -52,6 +52,7 @@ namespace ts {
     //!
     class TSDUCKDLL Thread
     {
+        TS_NOCOPY(Thread);
     public:
         //!
         //! Fatal low-level threading error.
@@ -197,15 +198,10 @@ namespace ts {
         static void Yield();
 
     private:
-        // Forbidden operations
-        Thread(const Thread&) = delete;
-        Thread& operator=(const Thread&) = delete;
-
-        // Private members
         ThreadAttributes _attributes;
-        mutable Mutex _mutex;
-        volatile bool _started;
-        volatile bool _waiting;
+        mutable Mutex    _mutex;
+        volatile bool    _started;
+        volatile bool    _waiting;
 
         // Internal version of isCurrentThread(), bypass checks
         bool isCurrentThreadUnchecked() const;
