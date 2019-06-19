@@ -1350,3 +1350,42 @@ ts::UString ts::ResolveSymbolicLinks(const ts::UString &path, ResolveSymbolicLin
 
     return link;
 }
+
+
+//----------------------------------------------------------------------------
+// Get the name of a class from the @c type_info of an object.
+//----------------------------------------------------------------------------
+
+#if defined(TS_GCC)
+#include <cxxabi.h>
+#endif
+
+ts::UString ts::ClassName(const std::type_info& info)
+{
+    UString name;
+    const char* const rtti = info.name();
+    if (rtti != nullptr) {
+        // By default, use the plain RTTI name. Not always a pretty name.
+        name.assignFromUTF8(rtti);
+#if defined(TS_GCC)
+        // With gcc and clang, this is a C++ mangled name.
+        // Demangle it using the portable C++ ABI library.
+        int status = 0;
+        char* const demangled = abi::__cxa_demangle(rtti, nullptr, nullptr, &status);
+        if (demangled != nullptr) {
+            name.assignFromUTF8(demangled);
+            ::free(demangled);
+        }
+#endif
+        // Cleanup various initial decoration, depending on compiler.
+        if (name.startWith(u"class ")) {
+            name.erase(0, 6);
+        }
+        // MSC: `anonymous namespace'::
+        // GCC: (anonymous namespace)::
+        if (name.find(u"anonymous namespace") == 1 && name.find(u"::") == 21) {
+            name.erase(0, 23);
+        }
+    }
+    return name;
+}

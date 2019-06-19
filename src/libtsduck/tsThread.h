@@ -85,7 +85,14 @@ namespace ts {
         Thread(const ThreadAttributes& attributes);
 
         //!
-        //! Destructor
+        //! Destructor.
+        //!
+        //! All subclasses should wait for termination before exiting their destructor.
+        //! If this is not done, the thread could continue its parallel execution while
+        //! the member fields are destructed, which is invalid. As a fool-proof check,
+        //! the parent class Thread checks that the thread is actually terminated in
+        //! its own destructor and report a fatal error message on standard error if
+        //! this is not the case.
         //!
         //! @see waitForTermination()
         //!
@@ -109,6 +116,13 @@ namespace ts {
         //! @param [out] attributes Attributes of the thread.
         //!
         void getAttributes(ThreadAttributes& attributes);
+
+        //!
+        //! Get an implementation-specific name of the object class.
+        //! @return An implementation-specific name of the object class.
+        //! The result may be not portable. The returned value may be empty before start().
+        //!
+        UString getTypeName() const;
 
         //!
         //! Start the thread.
@@ -197,9 +211,17 @@ namespace ts {
         //!
         static void Yield();
 
+    protected:
+        //!
+        //! Set the type name.
+        //! @param [in] name The type name to set. If empty, the subclass type name is used.
+        //!
+        void setTypeName(const UString& name = UString());
+
     private:
         ThreadAttributes _attributes;
         mutable Mutex    _mutex;
+        UString          _typename;
         volatile bool    _started;
         volatile bool    _waiting;
 
