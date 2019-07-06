@@ -28,47 +28,55 @@
 //----------------------------------------------------------------------------
 //!
 //!  @file
-//!  Declare the ts::DektecInputPlugin class.
+//!  File input plugin for tsp.
 //!
 //----------------------------------------------------------------------------
 
 #pragma once
 #include "tsPlugin.h"
+#include "tsTSFileInput.h"
 
 namespace ts {
     //!
-    //! Dektec input plugin for @c tsp.
+    //! File input plugin for tsp.
     //! @ingroup plugin
     //!
-    class TSDUCKDLL DektecInputPlugin: public InputPlugin
+    class TSDUCKDLL FileInputPlugin: public InputPlugin
     {
-        TS_NOBUILD_NOCOPY(DektecInputPlugin);
+        TS_NOBUILD_NOCOPY(FileInputPlugin);
     public:
         //!
         //! Constructor.
         //! @param [in] tsp Associated callback to @c tsp executable.
         //!
-        DektecInputPlugin(TSP* tsp);
-
-        //!
-        //! Destructor.
-        //!
-        virtual ~DektecInputPlugin();
+        FileInputPlugin(TSP* tsp);
 
         // Implementation of plugin API
         virtual bool getOptions() override;
         virtual bool start() override;
         virtual bool stop() override;
         virtual size_t receive(TSPacket*, TSPacketMetadata*, size_t) override;
-        virtual bool isRealTime() override;
-        virtual BitRate getBitrate() override;
-        virtual size_t stackUsage() const override;
+        virtual bool abortInput() override;
 
     private:
-        class Guts;
-        Guts* _guts;
+        volatile bool _aborted;            // Set when abortInput() is set.
+        bool          _interleave;         // Read all files simultaneously with interleaving.
+        bool          _first_terminate;    // With _interleave, terminate when the first file terminates.
+        size_t        _interleave_chunk;   // Number of packets per chunk when _interleave.
+        size_t        _interleave_remain;  // Remaining packets to read in current chunk of current file.
+        size_t        _current_filename;   // Current file index in _filenames.
+        size_t        _current_file;       // Current file index in _files. Depends on _interleave.
+        size_t        _repeat_count;
+        uint64_t      _start_offset;
+        size_t        _base_label;
+        UStringVector _filenames;
+        std::set<size_t> _eof;             // Set of file indexes having reached end of file.
+        std::vector<TSFileInput> _files;   // Array of open files, only one without interleave.
 
-        // Configure the LNB. Return true on success.
-        bool configureLNB();
+        // Open one input file.
+        bool openFile(size_t name_index, size_t file_index);
+
+        // Close all files which are currently open.
+        bool closeAllFiles();
     };
 }

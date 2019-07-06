@@ -26,67 +26,37 @@
 // THE POSSIBILITY OF SUCH DAMAGE.
 //
 //----------------------------------------------------------------------------
-
-#include "tsTSPacketMetadata.h"
-TSDUCK_SOURCE;
-
-const ts::TSPacketMetadata::LabelSet ts::TSPacketMetadata::NoLabel;
-const ts::TSPacketMetadata::LabelSet ts::TSPacketMetadata::AllLabels(~NoLabel);
-
-
-//----------------------------------------------------------------------------
-// Constructor.
+//!
+//!  @file
+//!  File output plugin for tsp.
+//!
 //----------------------------------------------------------------------------
 
-ts::TSPacketMetadata::TSPacketMetadata() :
-    _labels(),
-    _flush(false),
-    _bitrate_changed(false),
-    _input_stuffing(false),
-    _nullified(false)
-{
-}
+#pragma once
+#include "tsPlugin.h"
+#include "tsTSFileOutput.h"
 
+namespace ts {
+    //!
+    //! File output plugin for tsp.
+    //! @ingroup plugin
+    //!
+    class TSDUCKDLL FileOutputPlugin: public OutputPlugin
+    {
+        TS_NOBUILD_NOCOPY(FileOutputPlugin);
+    public:
+        //!
+        //! Constructor.
+        //! @param [in] tsp Associated callback to @c tsp executable.
+        //!
+        FileOutputPlugin(TSP* tsp);
 
-//----------------------------------------------------------------------------
-// Reset the content of this instance.
-//----------------------------------------------------------------------------
+        // Implementation of plugin API
+        virtual bool start() override;
+        virtual bool stop() override;
+        virtual bool send(const TSPacket*, const TSPacketMetadata*, size_t) override;
 
-void ts::TSPacketMetadata::reset()
-{
-    _labels.reset();
-    _flush = false;
-    _bitrate_changed = false;
-    _input_stuffing = false;
-    _nullified = false;
-}
-
-
-//----------------------------------------------------------------------------
-// Label operations
-//----------------------------------------------------------------------------
-
-bool ts::TSPacketMetadata::hasLabel(size_t label) const
-{
-    return label < _labels.size() && _labels.test(label);
-}
-
-bool ts::TSPacketMetadata::hasAnyLabel(const LabelSet& mask) const
-{
-    return (_labels & mask).any(); 
-}
-
-bool ts::TSPacketMetadata::hasAllLabels(const LabelSet& mask) const
-{
-    return (_labels & mask) == mask; 
-}
-
-void ts::TSPacketMetadata::setLabels(const LabelSet& mask)
-{
-    _labels |= mask;
-}
-
-void ts::TSPacketMetadata::clearLabels(const LabelSet& mask)
-{
-    _labels &= ~mask;
+    private:
+        TSFileOutput _file;
+    };
 }

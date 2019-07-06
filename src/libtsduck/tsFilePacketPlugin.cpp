@@ -27,66 +27,44 @@
 //
 //----------------------------------------------------------------------------
 
-#include "tsTSPacketMetadata.h"
+#include "tsFilePacketPlugin.h"
 TSDUCK_SOURCE;
 
-const ts::TSPacketMetadata::LabelSet ts::TSPacketMetadata::NoLabel;
-const ts::TSPacketMetadata::LabelSet ts::TSPacketMetadata::AllLabels(~NoLabel);
-
 
 //----------------------------------------------------------------------------
-// Constructor.
+// Packet processor constructor
 //----------------------------------------------------------------------------
 
-ts::TSPacketMetadata::TSPacketMetadata() :
-    _labels(),
-    _flush(false),
-    _bitrate_changed(false),
-    _input_stuffing(false),
-    _nullified(false)
+ts::FilePacketPlugin::FilePacketPlugin(TSP* tsp_) :
+    ProcessorPlugin(tsp_, u"Write packets to a file and pass them to next plugin", u"[options] file-name"),
+    _file()
 {
+    option(u"", 0, STRING, 1, 1);
+    help(u"", u"Name of the created output file.");
+
+    option(u"append", 'a');
+    help(u"append", u"If the file already exists, append to the end of the file. By default, existing files are overwritten.");
+
+    option(u"keep", 'k');
+    help(u"keep", u"Keep existing file (abort if the specified file already exists). By default, existing files are overwritten.");
 }
 
 
 //----------------------------------------------------------------------------
-// Reset the content of this instance.
+// Packet processor plugin methods
 //----------------------------------------------------------------------------
 
-void ts::TSPacketMetadata::reset()
+bool ts::FilePacketPlugin::start()
 {
-    _labels.reset();
-    _flush = false;
-    _bitrate_changed = false;
-    _input_stuffing = false;
-    _nullified = false;
+    return _file.open(value(u""), present(u"append"), present(u"keep"), *tsp);
 }
 
-
-//----------------------------------------------------------------------------
-// Label operations
-//----------------------------------------------------------------------------
-
-bool ts::TSPacketMetadata::hasLabel(size_t label) const
+bool ts::FilePacketPlugin::stop()
 {
-    return label < _labels.size() && _labels.test(label);
+    return _file.close(*tsp);
 }
 
-bool ts::TSPacketMetadata::hasAnyLabel(const LabelSet& mask) const
+ts::ProcessorPlugin::Status ts::FilePacketPlugin::processPacket(TSPacket& pkt, TSPacketMetadata& pkt_data)
 {
-    return (_labels & mask).any(); 
-}
-
-bool ts::TSPacketMetadata::hasAllLabels(const LabelSet& mask) const
-{
-    return (_labels & mask) == mask; 
-}
-
-void ts::TSPacketMetadata::setLabels(const LabelSet& mask)
-{
-    _labels |= mask;
-}
-
-void ts::TSPacketMetadata::clearLabels(const LabelSet& mask)
-{
-    _labels &= ~mask;
+    return _file.write(&pkt, 1, *tsp) ? TSP_OK : TSP_END;
 }

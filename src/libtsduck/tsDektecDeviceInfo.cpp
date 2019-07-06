@@ -27,66 +27,73 @@
 //
 //----------------------------------------------------------------------------
 
-#include "tsTSPacketMetadata.h"
+#include "tsDektecDeviceInfo.h"
+#include "tsDektecDevice.h"
 TSDUCK_SOURCE;
 
-const ts::TSPacketMetadata::LabelSet ts::TSPacketMetadata::NoLabel;
-const ts::TSPacketMetadata::LabelSet ts::TSPacketMetadata::AllLabels(~NoLabel);
-
 
 //----------------------------------------------------------------------------
-// Constructor.
+// Constructors.
 //----------------------------------------------------------------------------
 
-ts::TSPacketMetadata::TSPacketMetadata() :
-    _labels(),
-    _flush(false),
-    _bitrate_changed(false),
-    _input_stuffing(false),
-    _nullified(false)
+ts::DektecDeviceInfo::DektecDeviceInfo() :
+    model(),
+    description(),
+    inputPorts(),
+    outputPorts()
+{
+}
+
+ts::DektecDeviceInfo::PortInfo::PortInfo() :
+    type(),
+    description()
 {
 }
 
 
 //----------------------------------------------------------------------------
-// Reset the content of this instance.
+// Get information on all Dektec devices in the system.
 //----------------------------------------------------------------------------
 
-void ts::TSPacketMetadata::reset()
+bool ts::DektecDeviceInfo::GetAllDevices(DektecDeviceInfoVector& info, Report& report)
 {
-    _labels.reset();
-    _flush = false;
-    _bitrate_changed = false;
-    _input_stuffing = false;
-    _nullified = false;
-}
+    info.clear();
 
+#if !defined(TS_NO_DTAPI)
 
-//----------------------------------------------------------------------------
-// Label operations
-//----------------------------------------------------------------------------
+    // Get all devices.
+    DektecDeviceVector devlist;
+    if (!DektecDevice::GetAllDevices(devlist, report)) {
+        return false;
+    }
 
-bool ts::TSPacketMetadata::hasLabel(size_t label) const
-{
-    return label < _labels.size() && _labels.test(label);
-}
+    // Build the list of descriptions.
+    info.resize(devlist.size());
+    for (size_t devindex = 0; devindex < devlist.size(); ++devindex) {
 
-bool ts::TSPacketMetadata::hasAnyLabel(const LabelSet& mask) const
-{
-    return (_labels & mask).any(); 
-}
+        DektecDeviceInfo& inf(info[devindex]);
+        const DektecDevice& dev(devlist[devindex]);
 
-bool ts::TSPacketMetadata::hasAllLabels(const LabelSet& mask) const
-{
-    return (_labels & mask) == mask; 
-}
+        // Device characteristics.
+        inf.model = dev.model;
+        inf.description = DektecDevice::GetDeviceDescription(dev.desc);
 
-void ts::TSPacketMetadata::setLabels(const LabelSet& mask)
-{
-    _labels |= mask;
-}
+        // Input ports characteristics.
+        inf.inputPorts.resize(dev.input.size());
+        for (size_t n = 0; n < dev.input.size(); ++n) {
+            inf.inputPorts[n].type = DektecDevice::GetInterfaceDescription(dev.input[n]);
+            inf.inputPorts[n].description = DektecDevice::GetPortDescription(dev.input[n]);
+        }
 
-void ts::TSPacketMetadata::clearLabels(const LabelSet& mask)
-{
-    _labels &= ~mask;
+        // Output ports characteristics.
+        inf.outputPorts.resize(dev.output.size());
+        for (size_t n = 0; n < dev.output.size(); ++n) {
+            inf.outputPorts[n].type = DektecDevice::GetInterfaceDescription(dev.output[n]);
+            inf.outputPorts[n].description = DektecDevice::GetPortDescription(dev.output[n]);
+        }
+    }
+
+#endif // TS_NO_DTAPI
+
+    return true;
 }

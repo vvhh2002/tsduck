@@ -11,6 +11,7 @@ HEADERS += \
     ../../../src/libtsduck/tsAbstractDescrambler.h \
     ../../../src/libtsduck/tsAbstractDescriptor.h \
     ../../../src/libtsduck/tsAbstractDescriptorsTable.h \
+    ../../../src/libtsduck/tsAbstractDuplicateRemapPlugin.h \
     ../../../src/libtsduck/tsAbstractHTTPInputPlugin.h \
     ../../../src/libtsduck/tsAbstractLongTable.h \
     ../../../src/libtsduck/tsAbstractMultilingualDescriptor.h \
@@ -112,6 +113,7 @@ HEADERS += \
     ../../../src/libtsduck/tsDataStreamAlignmentDescriptor.h \
     ../../../src/libtsduck/tsDeferredAssociationTagsDescriptor.h \
     ../../../src/libtsduck/tsDektecControl.h \
+    ../../../src/libtsduck/tsDektecDeviceInfo.h \
     ../../../src/libtsduck/tsDektecInputPlugin.h \
     ../../../src/libtsduck/tsDektecOutputPlugin.h \
     ../../../src/libtsduck/tsDektecUtils.h \
@@ -167,7 +169,10 @@ HEADERS += \
     ../../../src/libtsduck/tsExternalApplicationAuthorizationDescriptor.h \
     ../../../src/libtsduck/tsExternalESIdDescriptor.h \
     ../../../src/libtsduck/tsFatal.h \
+    ../../../src/libtsduck/tsFileInputPlugin.h \
     ../../../src/libtsduck/tsFileNameRate.h \
+    ../../../src/libtsduck/tsFileOutputPlugin.h \
+    ../../../src/libtsduck/tsFilePacketPlugin.h \
     ../../../src/libtsduck/tsForkPipe.h \
     ../../../src/libtsduck/tsGitHubRelease.h \
     ../../../src/libtsduck/tsGraphicsConstraintsDescriptor.h \
@@ -293,6 +298,7 @@ HEADERS += \
     ../../../src/libtsduck/tsProtectionMessageDescriptor.h \
     ../../../src/libtsduck/tsPSILogger.h \
     ../../../src/libtsduck/tsPSILoggerArgs.h \
+    ../../../src/libtsduck/tsPSIMerger.h \
     ../../../src/libtsduck/tsPushInputPlugin.h \
     ../../../src/libtsduck/tsRandomGenerator.h \
     ../../../src/libtsduck/tsRegistrationDescriptor.h \
@@ -511,6 +517,7 @@ SOURCES += \
     ../../../src/libtsduck/tsAbstractDescrambler.cpp \
     ../../../src/libtsduck/tsAbstractDescriptor.cpp \
     ../../../src/libtsduck/tsAbstractDescriptorsTable.cpp \
+    ../../../src/libtsduck/tsAbstractDuplicateRemapPlugin.cpp \
     ../../../src/libtsduck/tsAbstractHTTPInputPlugin.cpp \
     ../../../src/libtsduck/tsAbstractLongTable.cpp \
     ../../../src/libtsduck/tsAbstractMultilingualDescriptor.cpp \
@@ -590,6 +597,7 @@ SOURCES += \
     ../../../src/libtsduck/tsDataStreamAlignmentDescriptor.cpp \
     ../../../src/libtsduck/tsDeferredAssociationTagsDescriptor.cpp \
     ../../../src/libtsduck/tsDektecControl.cpp \
+    ../../../src/libtsduck/tsDektecDeviceInfo.cpp \
     ../../../src/libtsduck/tsDektecInputPlugin.cpp \
     ../../../src/libtsduck/tsDektecOutputPlugin.cpp \
     ../../../src/libtsduck/tsDektecUtils.cpp \
@@ -637,7 +645,10 @@ SOURCES += \
     ../../../src/libtsduck/tsExternalApplicationAuthorizationDescriptor.cpp \
     ../../../src/libtsduck/tsExternalESIdDescriptor.cpp \
     ../../../src/libtsduck/tsFatal.cpp \
+    ../../../src/libtsduck/tsFileInputPlugin.cpp \
     ../../../src/libtsduck/tsFileNameRate.cpp \
+    ../../../src/libtsduck/tsFileOutputPlugin.cpp \
+    ../../../src/libtsduck/tsFilePacketPlugin.cpp \
     ../../../src/libtsduck/tsForkPipe.cpp \
     ../../../src/libtsduck/tsGitHubRelease.cpp \
     ../../../src/libtsduck/tsGraphicsConstraintsDescriptor.cpp \
@@ -755,6 +766,7 @@ SOURCES += \
     ../../../src/libtsduck/tsProtectionMessageDescriptor.cpp \
     ../../../src/libtsduck/tsPSILogger.cpp \
     ../../../src/libtsduck/tsPSILoggerArgs.cpp \
+    ../../../src/libtsduck/tsPSIMerger.cpp \
     ../../../src/libtsduck/tsPushInputPlugin.cpp \
     ../../../src/libtsduck/tsRandomGenerator.cpp \
     ../../../src/libtsduck/tsRegistrationDescriptor.cpp \

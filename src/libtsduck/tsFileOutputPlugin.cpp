@@ -27,66 +27,44 @@
 //
 //----------------------------------------------------------------------------
 
-#include "tsTSPacketMetadata.h"
+#include "tsFileOutputPlugin.h"
 TSDUCK_SOURCE;
 
-const ts::TSPacketMetadata::LabelSet ts::TSPacketMetadata::NoLabel;
-const ts::TSPacketMetadata::LabelSet ts::TSPacketMetadata::AllLabels(~NoLabel);
-
 
 //----------------------------------------------------------------------------
-// Constructor.
+// Constructor
 //----------------------------------------------------------------------------
 
-ts::TSPacketMetadata::TSPacketMetadata() :
-    _labels(),
-    _flush(false),
-    _bitrate_changed(false),
-    _input_stuffing(false),
-    _nullified(false)
+ts::FileOutputPlugin::FileOutputPlugin(TSP* tsp_) :
+    OutputPlugin(tsp_, u"Write packets to a file", u"[options] [file-name]"),
+    _file()
 {
+    option(u"", 0, STRING, 0, 1);
+    help(u"", u"Name of the created output file. Use standard output by default.");
+
+    option(u"append", 'a');
+    help(u"append", u"If the file already exists, append to the end of the file. By default, existing files are overwritten.");
+
+    option(u"keep", 'k');
+    help(u"keep", u"Keep existing file (abort if the specified file already exists). By default, existing files are overwritten.");
 }
 
 
 //----------------------------------------------------------------------------
-// Reset the content of this instance.
+// Output plugin methods
 //----------------------------------------------------------------------------
 
-void ts::TSPacketMetadata::reset()
+bool ts::FileOutputPlugin::start()
 {
-    _labels.reset();
-    _flush = false;
-    _bitrate_changed = false;
-    _input_stuffing = false;
-    _nullified = false;
+    return _file.open(value(u""), present(u"append"), present(u"keep"), *tsp);
 }
 
-
-//----------------------------------------------------------------------------
-// Label operations
-//----------------------------------------------------------------------------
-
-bool ts::TSPacketMetadata::hasLabel(size_t label) const
+bool ts::FileOutputPlugin::stop()
 {
-    return label < _labels.size() && _labels.test(label);
+    return _file.close(*tsp);
 }
 
-bool ts::TSPacketMetadata::hasAnyLabel(const LabelSet& mask) const
+bool ts::FileOutputPlugin::send(const TSPacket* buffer, const TSPacketMetadata* pkt_data, size_t packet_count)
 {
-    return (_labels & mask).any(); 
-}
-
-bool ts::TSPacketMetadata::hasAllLabels(const LabelSet& mask) const
-{
-    return (_labels & mask) == mask; 
-}
-
-void ts::TSPacketMetadata::setLabels(const LabelSet& mask)
-{
-    _labels |= mask;
-}
-
-void ts::TSPacketMetadata::clearLabels(const LabelSet& mask)
-{
-    _labels &= ~mask;
+    return _file.write(buffer, packet_count, *tsp);
 }

@@ -28,7 +28,7 @@
 //----------------------------------------------------------------------------
 //!
 //!  @file
-//!  Declare the ts::DektecInputPlugin class.
+//!  Declare the ts::AbstractDuplicateRemapPlugin class.
 //!
 //----------------------------------------------------------------------------
 
@@ -37,38 +37,40 @@
 
 namespace ts {
     //!
-    //! Dektec input plugin for @c tsp.
+    //! Abstract base class for the plugins @c duplicate and @c remap.
+    //! This common base class defines the common options and their parsing.
     //! @ingroup plugin
     //!
-    class TSDUCKDLL DektecInputPlugin: public InputPlugin
+    class TSDUCKDLL AbstractDuplicateRemapPlugin: public ProcessorPlugin
     {
-        TS_NOBUILD_NOCOPY(DektecInputPlugin);
+        TS_NOCOPY(AbstractDuplicateRemapPlugin);
     public:
         //!
         //! Constructor.
+        //! @param [in] remap If true, use "remap" in help text, otherwise use "duplicate".
         //! @param [in] tsp Associated callback to @c tsp executable.
+        //! @param [in] description A short one-line description, eg. "Wonderful File Copier".
+        //! @param [in] syntax A short one-line syntax summary, eg. "[options] filename ...".
         //!
-        DektecInputPlugin(TSP* tsp);
-
-        //!
-        //! Destructor.
-        //!
-        virtual ~DektecInputPlugin();
+        AbstractDuplicateRemapPlugin(bool remap, TSP* tsp, const UString& description = UString(), const UString& syntax = UString());
 
         // Implementation of plugin API
         virtual bool getOptions() override;
-        virtual bool start() override;
-        virtual bool stop() override;
-        virtual size_t receive(TSPacket*, TSPacketMetadata*, size_t) override;
-        virtual bool isRealTime() override;
-        virtual BitRate getBitrate() override;
-        virtual size_t stackUsage() const override;
+
+    protected:
+        typedef std::map<PID, PID> PIDMap;        //!< A map from PID to PID.
+        bool                       _unchecked;    //!< Ignore conflicting input/output PID's.
+        PIDSet                     _newPIDs;      //!< Set of output (duplicated or remapped) PID values.
+        PIDMap                     _pidMap;       //!< Key = input pid, value = output PID.
+        TSPacketMetadata::LabelSet _setLabels;    //!< Labels to set on output packets.
+        TSPacketMetadata::LabelSet _resetLabels;  //!< Labels to reset on output packets.
 
     private:
-        class Guts;
-        Guts* _guts;
-
-        // Configure the LNB. Return true on success.
-        bool configureLNB();
+        const bool _remap;
+        // Strings for help and error messages:
+        const UString _noun;
+        const UString _verb;
+        const UString _verbed;
+        const UString _verbing;
     };
 }
