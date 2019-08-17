@@ -26,35 +26,10 @@
 // THE POSSIBILITY OF SUCH DAMAGE.
 //
 //----------------------------------------------------------------------------
-//!
-//!  @file
-//!  Conditional Access Systems families
-//!
-//----------------------------------------------------------------------------
 
-#pragma once
-#include "tsPlatform.h"
+#include "tsBlockCipherAlertInterface.h"
+TSDUCK_SOURCE;
 
-namespace ts {
-    //!
-    //! Known Conditional Access Systems families.
-    //! @ingroup mpeg
-    //!
-    enum CASFamily {
-        CAS_OTHER       = 0,  //!< Unknown CAS.
-        CAS_MEDIAGUARD  = 1,  //!< MediaGuard (Canal+ Technologies).
-        CAS_NAGRA       = 2,  //!< Nagravision.
-        CAS_VIACCESS    = 3,  //!< Viaccess.
-        CAS_THALESCRYPT = 4,  //!< ThalesCrypt (for TPS).
-        CAS_SAFEACCESS  = 5,  //!< SafeAccess (Logiways).
-        CAS_WIDEVINE    = 6,  //!< Widevine CAS (Google).
-    };
-
-    //!
-    //! Return a CAS family from a CA system id.
-    //! Useful to analyze CA descriptors.
-    //! @param [in] ca_system_id DVB-allocated CA system id.
-    //! @return A CAS family enumeration value.
-    //!
-    TSDUCKDLL CASFamily CASFamilyOf(uint16_t ca_system_id);
+ts::BlockCipherAlertInterface::~BlockCipherAlertInterface()
+{
 }

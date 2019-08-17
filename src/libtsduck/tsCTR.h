@@ -28,7 +28,7 @@
 //----------------------------------------------------------------------------
 //!
 //!  @file
-//!  Cipher text Stealing (CTS) mode, alternative 1.
+//!  Counter (CTR) chaining mode.
 //!
 //----------------------------------------------------------------------------
 
@@ -37,30 +37,40 @@
 
 namespace ts {
     //!
-    //!  Cipher text Stealing (CTS) mode, alternative 1.
-    //!  @ingroup crypto
+    //! Counter (CTR) chaining mode.
+    //! @ingroup crypto
     //!
-    //!  Several incompatible designs of CTS exist. This one implements the
-    //!  description in:
-    //!  - Bruce Schneier, Applied Cryptography (2nd, Ed.), pp 191, 195
-    //!  - RFC 2040, The RC5, RC5-CBC, RC5-CBC-Pad, and RC5-CTS Algorithms
-    //!  - "CBC ciphertext stealing" in
-    //!    http://en.wikipedia.org/wiki/Ciphertext_stealing
-    //!
-    //!  CTS can process a residue. The plain text and cipher text sizes must be
-    //!  greater than the block size of the underlying block cipher.
+    //! CTR can process a residue. The plain text and cipher text can have any size.
     //!
     //! @tparam CIPHER A subclass of ts::BlockCipher, the underlying block cipher.
     //!
     template <class CIPHER>
-    class CTS1: public CipherChainingTemplate<CIPHER>
+    class CTR: public CipherChainingTemplate<CIPHER>
     {
-        TS_NOCOPY(CTS1);
+        TS_NOCOPY(CTR);
     public:
         //!
         //! Constructor.
+        //! @param [in] counter_bits Number of bits of the counter part in the IV.
+        //! See setCounterBits() for an explanation of this value.
         //!
-        CTS1() : CipherChainingTemplate<CIPHER>(1, 1, 2) {}
+        CTR(size_t counter_bits = 0);
+
+        //!
+        //! Set the size of the counter part in the IV.
+        //! @param [in] counter_bits Number of bits of the counter part in the IV.
+        //! In CTR mode, the IV is considered as an integer in big-endian representation.
+        //! The counter part of the IV uses the least significant bits of the IV.
+        //! The default value (when specified as zero) is half the size of the IV.
+        //!
+        void setCounterBits(size_t counter_bits);
+
+        //!
+        //! Get the size of the counter part in the IV.
+        //! @return Number of bits of the counter part in the IV.
+        //! See setCounterBits() for an explanation of this value.
+        //!
+        size_t counterBits() const {return _counter_bits;}
 
         // Implementation of CipherChaining interface.
         virtual size_t minMessageSize() const override;
@@ -73,7 +83,16 @@ namespace ts {
         // Implementation of BlockCipher interface.
         virtual bool encryptImpl(const void* plain, size_t plain_length, void* cipher, size_t cipher_maxsize, size_t* cipher_length) override;
         virtual bool decryptImpl(const void* cipher, size_t cipher_length, void* plain, size_t plain_maxsize, size_t* plain_length) override;
+
+    private:
+        size_t _counter_bits; // size in bits of the counter part.
+
+        // We need two work blocks.
+        // The first one contains the "input block" or counter.
+        // The second one contains the "output block", the encrypted counter.
+        // This private method increments the counter block.
+        bool incrementCounter();
     };
 }
 
-#include "tsCTS1Template.h"
+#include "tsCTRTemplate.h"
