@@ -29,6 +29,7 @@
 
 #include "tsTSScrambling.h"
 #include "tsNames.h"
+#include "tsArgs.h"
 TSDUCK_SOURCE;
 
 
@@ -144,7 +145,7 @@ bool ts::TSScrambling::setScramblingType(uint8_t scrambling, bool overrideExplic
 
         // Set scrambling type.
         if (_scrambling_type != scrambling) {
-            _report.debug(u"switching scrambling type from %s to %s", {DVBNameFromSection(u"ScramblingMode", _scrambling_type), DVBNameFromSection(u"ScramblingMode", scrambling)});
+            _report.debug(u"switching scrambling type from %s to %s", {NameFromSection(u"ScramblingMode", _scrambling_type), NameFromSection(u"ScramblingMode", scrambling)});
             _scrambling_type = scrambling;
         }
     }
@@ -168,7 +169,7 @@ void ts::TSScrambling::setEntropyMode(DVBCSA2::EntropyMode mode)
 // Define command line options in an Args.
 //----------------------------------------------------------------------------
 
-void ts::TSScrambling::defineOptions(Args& args) const
+void ts::TSScrambling::defineArgs(Args &args) const
 {
     args.option(u"aes-cbc");
     args.help(u"aes-cbc",
@@ -252,7 +253,7 @@ void ts::TSScrambling::defineOptions(Args& args) const
 // Args error indicator is set in case of incorrect arguments
 //----------------------------------------------------------------------------
 
-bool ts::TSScrambling::loadArgs(Args& args)
+bool ts::TSScrambling::loadArgs(DuckContext& duck, Args& args)
 {
     // Number of explicitly defined scrambling algorithms.
     const int algo_count =

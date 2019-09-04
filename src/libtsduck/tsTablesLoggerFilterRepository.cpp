@@ -26,58 +26,53 @@
 // THE POSSIBILITY OF SUCH DAMAGE.
 //
 //----------------------------------------------------------------------------
-//!
-//!  @file
-//!  Command line options for parsing and formatting XML documents.
-//!
+
+#include "tsTablesLoggerFilterRepository.h"
+TSDUCK_SOURCE;
+
+TS_DEFINE_SINGLETON(ts::TablesLoggerFilterRepository);
+
+
+//----------------------------------------------------------------------------
+// Constructors and destructors.
 //----------------------------------------------------------------------------
 
-#pragma once
-#include "tsArgs.h"
-#include "tsxmlTweaks.h"
+ts::TablesLoggerFilterRepository::TablesLoggerFilterRepository() :
+    _factories()
+{
+}
 
-namespace ts {
-    namespace xml {
-        //!
-        //! Command line options for parsing and formatting XML documents.
-        //! @ingroup cmd
-        //!
-        class TSDUCKDLL TweaksArgs
-        {
-        public:
-            // Public fields
-            bool strictXML;  //!< Option -\-strict-xml.
 
-            //!
-            //! Default constructor.
-            //!
-            TweaksArgs();
+//----------------------------------------------------------------------------
+// This inner class constructor registers a section filter factory.
+//----------------------------------------------------------------------------
 
-            //!
-            //! Define command line options in an Args.
-            //! @param [in,out] args Command line arguments to update.
-            //!
-            void defineOptions(Args& args) const;
+ts::TablesLoggerFilterRepository::Register::Register(FilterFactory factory)
+{
+    if (factory != nullptr) {
+        TablesLoggerFilterRepository::Instance()->_factories.push_back(factory);
+    }
+}
 
-            //!
-            //! Load arguments from command line.
-            //! Args error indicator is set in case of incorrect arguments.
-            //! @param [in,out] args Command line arguments.
-            //! @return True on success, false on error in argument line.
-            //!
-            bool load(Args& args);
 
-            //!
-            //! Set the relevant XML tweaks.
-            //! @param [in,out] tweaks Tweaks to be updated from the command line options.
-            //!
-            void setTweaks(Tweaks& tweaks) const;
+//----------------------------------------------------------------------------
+// Create an instance of all registered section filters.
+//----------------------------------------------------------------------------
 
-            //!
-            //! Get relevant XML tweaks in a default tweaks structure.
-            //! @return Tweaks from the command line options.
-            //!
-            Tweaks tweaks() const;
-        };
+void ts::TablesLoggerFilterRepository::createFilters(TablesLoggerFilterVector& filters) const
+{
+    // Pre-reserve memory.
+    filters.clear();
+    filters.reserve(_factories.size());
+
+    // Allocate an instance of each registered class.
+    // Encapsulate all allocated object into a safe pointer.
+    for (size_t i = 0; i < _factories.size(); ++i) {
+        if (_factories[i] != nullptr) {
+            TablesLoggerFilterPtr ptr(_factories[i]());
+            if (!ptr.isNull()) {
+                filters.push_back(ptr);
+            }
+        }
     }
 }

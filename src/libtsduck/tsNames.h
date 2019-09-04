@@ -36,6 +36,7 @@
 #pragma once
 #include "tsUString.h"
 #include "tsCASFamily.h"
+#include "tsMPEG.h"
 #include "tsReport.h"
 #include "tsSingletonManager.h"
 
@@ -64,11 +65,11 @@ namespace ts {
         //!
         //! Name of Table ID.
         //! @param [in] tid Table id.
-        //! @param [in] cas CAS family for EMM/ECM table ids.
+        //! @param [in] cas CAS id for EMM/ECM table ids.
         //! @param [in] flags Presentation flags.
         //! @return The corresponding name.
         //!
-        TSDUCKDLL UString TID(uint8_t tid, ts::CASFamily cas = CAS_OTHER, Flags flags = NAME);
+        TSDUCKDLL UString TID(uint8_t tid, uint16_t cas = CASID_NULL, Flags flags = NAME);
 
         //!
         //! Name of Descriptor ID.
@@ -347,7 +348,7 @@ namespace ts {
 
     //!
     //! A repository of names for MPEG/DVB entities.
-    //! All names are loaded from configuration files @em tsduck.*.names.
+    //! All names are loaded from configuration files @em tsduck*.names.
     //!
     class TSDUCKDLL Names
     {
@@ -356,8 +357,9 @@ namespace ts {
         //!
         //! Constructor.
         //! @param [in] fileName Configuration file name. Typically without directory name.
+        //! @param [in] mergeExtensions If true, merge the content of names files from extensions.
         //!
-        Names(const UString& fileName);
+        Names(const UString& fileName, bool mergeExtensions = false);
 
         //!
         //! Virtual destructor.
@@ -477,10 +479,12 @@ namespace ts {
         // Compute the display mask
         static Value DisplayMask(size_t bits);
 
+        // Load a configuration file and merge its content into this instance.
+        void loadFile(const UString& fileName);
+
         // Names private fields.
         Report&          _log;           // Error logger.
         const UString    _configFile;    // Configuration file path.
-        size_t           _configLines;   // Number of lines in configuration file.
         size_t           _configErrors;  // Number of errors in configuration file.
         ConfigSectionMap _sections;      // Configuration sections.
     };
@@ -488,11 +492,11 @@ namespace ts {
     //!
     //! An instance of names repository containing all MPEG and DVB identifiers.
     //!
-    class TSDUCKDLL NamesDVB : public Names
+    class TSDUCKDLL NamesMain : public Names
     {
-        TS_DECLARE_SINGLETON(NamesDVB);
+        TS_DECLARE_SINGLETON(NamesMain);
     public:
-        virtual ~NamesDVB() override;  //!< Destructor
+        virtual ~NamesMain() override;  //!< Destructor
     };
 
     //!
@@ -517,9 +521,9 @@ namespace ts {
     //! @return The corresponding name.
     //!
     template <typename INT, typename std::enable_if<std::is_integral<INT>::value>::type* = nullptr>
-    UString DVBNameFromSection(const UString& sectionName, INT value, names::Flags flags = names::NAME, size_t bits = 0, INT alternateValue = 0)
+    UString NameFromSection(const UString& sectionName, INT value, names::Flags flags = names::NAME, size_t bits = 0, INT alternateValue = 0)
     {
-        return NamesDVB::Instance()->nameFromSection(sectionName, Names::Value(value), flags, bits, Names::Value(alternateValue));
+        return NamesMain::Instance()->nameFromSection(sectionName, Names::Value(value), flags, bits, Names::Value(alternateValue));
     }
 }
 
