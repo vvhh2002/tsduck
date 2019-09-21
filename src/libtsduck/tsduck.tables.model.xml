@@ -75,7 +75,7 @@
       <!-- Program-level descriptors -->
       <_any in="_descriptors"/>
       <!-- One per elementary stream -->
-      <component stream_type="uint8, required" elementary_PID="uint13, required">
+      <component stream_type="uint8, required" elementary_PID="uint13, require">
         <_any in="_descriptors"/>
       </component>
     </PMT>
@@ -272,6 +272,43 @@
       <!-- Splice descriptors, depend on splice command -->
       <_any in="_descriptors"/>
     </splice_information_table>
+
+    <!-- Cable Emergency Alert (ANSI/SCTE 18) -->
+    <cable_emergency_alert_table
+        sequence_number="uint5, required"
+        protocol_version="uint8, default=0"
+        EAS_event_ID="uint16, required"
+        EAS_originator_code="char3, required"
+        EAS_event_code="string, required"
+        alert_message_time_remaining="uint8, optional"
+        event_start_time="YYYY-MM-DD hh:mm:ss, optional"
+        event_duration="uint16, optional"
+        alert_priority="uint4, required"
+        details_OOB_source_ID="uint16, optional"
+        details_major_channel_number="uint10, optional"
+        details_minor_channel_number="uint10, optional"
+        audio_OOB_source_ID="uint16, optional">
+      <!-- Optional ATSC multiple_string_structure() containing one or more strings -->
+      <nature_of_activation_text>
+        <string language="char3, required" text="string, required"/>
+      </nature_of_activation_text>
+      <!-- Optional ATSC multiple_string_structure() containing one or more strings -->
+      <alert_text>
+        <string language="char3, required" text="string, required"/>
+      </alert_text>
+      <!-- From 1 to 31 location structures -->
+      <location
+          state_code="uint8, required"
+          county_subdivision="uint4, required"
+          county_code="uint10, required"/>
+      <!-- Up to 255 exception structures -->
+      <!-- Specify either exception_major_channel_number+exception_minor_channel_number or exception_OOB_source_ID -->
+      <exception
+          major_channel_number="uint10, optional"
+          minor_channel_number="uint10, optional"
+          OOB_source_ID="uint16, optional"/>
+      <_any in="_descriptors"/>
+    </cable_emergency_alert_table>
 
     <!-- ATSC Master Guide Table -->
     <MGT version="uint5, default=0" protocol_version="uint8, default=0">
@@ -598,6 +635,13 @@
         language_code="char3, required"
         text="string, optional"/>
 
+    <component_name_descriptor>
+      <!-- Optional ATSC multiple_string_structure() containing one or more strings -->
+      <component_name_string>
+        <string language="char3, required" text="string, required"/>
+      </component_name_string>
+    </component_name_descriptor>
+
     <content_descriptor>
       <!-- One per classification -->
       <content content_nibble_level_1="uint4, required"
@@ -726,6 +770,36 @@
 
     <eacem_stream_identifier_descriptor version_byte="uint8, required"/>
 
+    <EAS_audio_file_descriptor>
+      <!-- Must be in a cable_emergency_alert_table (table id 0xD8) -->
+      <!-- One entry per audio file -->
+      <file audio_format="uint7, required"
+            file_name="string, optional"
+            audio_source="uint8, required"
+            program_number="uint16, optional"
+            carousel_id="uint32, optional"
+            application_id="uint16, optional"
+            download_id="uint32, optional"
+            module_id="uint32, optional"/>
+    </EAS_audio_file_descriptor>
+
+    <EAS_inband_details_channel_descriptor
+        details_RF_channel="uint8, required"
+        details_program_number="uint16, required">
+      <!-- Must be in a cable_emergency_alert_table (table id 0xD8) -->
+    </EAS_inband_details_channel_descriptor>
+
+    <EAS_inband_exception_channels_descriptor>
+      <!-- Must be in a cable_emergency_alert_table (table id 0xD8) -->
+      <!-- One entry per exception channel -->
+      <exception RF_channel="uint8, required" program_number="uint16, required"/>
+    </EAS_inband_exception_channels_descriptor>
+
+    <EAS_metadata_descriptor fragment_number="uint8, default=1">
+      <!-- Must be in a cable_emergency_alert_table (table id 0xD8) -->
+      <!-- The text inside this element is an XML fragment -->
+    </EAS_metadata_descriptor>
+
     <ECM_repetition_rate_descriptor
         CA_system_id="uint16, required"
         ECM_repetition_rate="uint16, required">
@@ -755,6 +829,13 @@
                service_id="uint16, required"
                eutelsat_channel_number="uint10, required"/>
     </eutelsat_channel_number_descriptor>
+
+    <extended_channel_name_descriptor>
+      <!-- Optional ATSC multiple_string_structure() containing one or more strings -->
+      <long_channel_name_text>
+        <string language="char3, required" text="string, required"/>
+      </long_channel_name_text>
+    </extended_channel_name_descriptor>
 
     <extended_event_descriptor
         descriptor_number="uint8, required"
@@ -1054,6 +1135,13 @@
       <service service_id="uint16, required"
                service_type="uint8, required"/>
     </service_list_descriptor>
+
+    <service_location_descriptor PCR_PID="uint13, optional">
+      <!-- One per component -->
+      <component stream_type="uint8, required"
+                 elementary_PID="uint13, required"
+                 ISO_639_language_code="char3, optional"/>
+    </service_location_descriptor>
 
     <service_move_descriptor
         new_original_network_id="uint16, required"

@@ -1,5 +1,6 @@
     REF_TYPE(AIT);
     REF_TYPE(BAT);
+    REF_TYPE(CableEmergencyAlertTable);
     REF_TYPE(CAT);
     REF_TYPE(CVCT);
     REF_TYPE(DiscontinuityInformationTable);
@@ -44,6 +45,7 @@
     REF_TYPE(CarouselIdentifierDescriptor);
     REF_TYPE(CIAncillaryDataDescriptor);
     REF_TYPE(ComponentDescriptor);
+    REF_TYPE(ComponentNameDescriptor);
     REF_TYPE(ContentDescriptor);
     REF_TYPE(CopyrightDescriptor);
     REF_TYPE(CountryAvailabilityDescriptor);
@@ -65,9 +67,14 @@
     REF_TYPE(EacemPreferredNameIdentifierDescriptor);
     REF_TYPE(EacemPreferredNameListDescriptor);
     REF_TYPE(EacemStreamIdentifierDescriptor);
+    REF_TYPE(EASAudioFileDescriptor);
+    REF_TYPE(EASInbandDetailsChannelDescriptor);
+    REF_TYPE(EASInbandExceptionChannelsDescriptor);
+    REF_TYPE(EASMetadataDescriptor);
     REF_TYPE(ECMRepetitionRateDescriptor);
     REF_TYPE(EnhancedAC3Descriptor);
     REF_TYPE(EutelsatChannelNumberDescriptor);
+    REF_TYPE(ExtendedChannelNameDescriptor);
     REF_TYPE(ExtendedEventDescriptor);
     REF_TYPE(ExternalApplicationAuthorizationDescriptor);
     REF_TYPE(ExternalESIdDescriptor);
@@ -114,6 +121,7 @@
     REF_TYPE(ServiceDescriptor);
     REF_TYPE(ServiceIdentifierDescriptor);
     REF_TYPE(ServiceListDescriptor);
+    REF_TYPE(ServiceLocationDescriptor);
     REF_TYPE(ServiceMoveDescriptor);
     REF_TYPE(ServiceRelocatedDescriptor);
     REF_TYPE(ShortEventDescriptor);

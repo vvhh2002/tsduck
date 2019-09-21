@@ -85,6 +85,7 @@ Bits = 8
 0xCD = STT (ATSC)
 0xD3 = DCCT (ATSC)
 0xD4 = DCCSCT (ATSC)
+0xD8 = Cable Emergency Alert (ATSC)
 0xFC = SCTE 35 Splice Information
 0xFF = Forbidden TID 0xFF
 # CAS-specific values, most significant byte is a CAS family.
@@ -511,6 +512,11 @@ Bits = 8
 0x74FFFFFFFF15 = AIT Simple Application Location
 0x74FFFFFFFF16 = AIT Application Usage
 0x74FFFFFFFF17 = AIT Simple Application Boundary
+# Valid in AES (0xD8, Emergency Alert System, SCTE 18):
+0xD8FFFFFFFF00 = SCTE 18 EAS In-Band Details Channel
+0xD8FFFFFFFF01 = SCTE 18 EAS In-Band Exceptions Channel
+0xD8FFFFFFFF02 = SCTE 18 EAS Audio File
+0xD8FFFFFFFF03 = SCTE 18 EAS Emergency Alert Metadata
 # Valid in an SIT (0xFC, Splice Information Table, ANSI / SCTE 35):
 0xFCFFFFFFFF00 = SCTE 35 Avail
 0xFCFFFFFFFF01 = SCTE 35 DTMF
@@ -2955,3 +2961,33 @@ Bits = 6
 0x03 = ATSC Audio
 0x04 = ATSC Data Only Service
 0x05 = ATSC Software Download Service
+
+[EASCountySubdivision]
+# in SCTE 18 emergency alert messages
+Bits = 4
+0 = All or unspecified
+1 = Northwest
+2 = North Central
+3 = Northeast
+4 = West Central
+5 = Central
+6 = East Central
+7 = Southwest
+8 = South Central
+9 = Southeast
+
+[EASAudioFormat]
+# in SCTE 18 audio file descriptor
+Bits = 8
+0x01 = Audio Interchange File Format (AIFF) ‐ Basic
+0x02 = Audio Interchange File Format (AIFF) ‐ Extended
+0x03 = Waveform audio format (WAV) ‐ Basic
+0x04 = Waveform audio format (WAV) ‐ Extended
+0x05 = MPEG‐1 Audio Layer 3 (MP3) ‐ Basic
+0x06 = MPEG‐1 Audio Layer 3 (MP3) ‐ Extended
+
+[EASAudioSource]
+# in SCTE 18 audio file descriptor
+Bits = 8
+0x01 = Out‐of‐band DSM‐CC Object Carousel
+0x02 = Out‐of‐band DSM‐CC Data Carousel

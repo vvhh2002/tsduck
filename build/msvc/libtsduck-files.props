@@ -49,6 +49,7 @@
     <ClInclude Include="..\..\src\libtsduck\tsArgsWithPlugins.h" />
     <ClInclude Include="..\..\src\libtsduck\tsAssociationTagDescriptor.h" />
     <ClInclude Include="..\..\src\libtsduck\tsAsyncReport.h" />
+    <ClInclude Include="..\..\src\libtsduck\tsATSCMultipleString.h" />
     <ClInclude Include="..\..\src\libtsduck\tsAudioAttributes.h" />
     <ClInclude Include="..\..\src\libtsduck\tsAudioLanguageOptions.h" />
     <ClInclude Include="..\..\src\libtsduck\tsAudioPreselectionDescriptor.h" />
@@ -72,6 +73,7 @@
     <ClInclude Include="..\..\src\libtsduck\tsBouquetNameDescriptor.h" />
     <ClInclude Include="..\..\src\libtsduck\tsByteBlock.h" />
     <ClInclude Include="..\..\src\libtsduck\tsCableDeliverySystemDescriptor.h" />
+    <ClInclude Include="..\..\src\libtsduck\tsCableEmergencyAlertTable.h" />
     <ClInclude Include="..\..\src\libtsduck\tsCADescriptor.h" />
     <ClInclude Include="..\..\src\libtsduck\tsCAIdentifierDescriptor.h" />
     <ClInclude Include="..\..\src\libtsduck\tsCarouselIdentifierDescriptor.h" />
@@ -90,6 +92,7 @@
     <ClInclude Include="..\..\src\libtsduck\tsCipherChainingTemplate.h" />
     <ClInclude Include="..\..\src\libtsduck\tsCOM.h" />
     <ClInclude Include="..\..\src\libtsduck\tsComponentDescriptor.h" />
+    <ClInclude Include="..\..\src\libtsduck\tsComponentNameDescriptor.h" />
     <ClInclude Include="..\..\src\libtsduck\tsCondition.h" />
     <ClInclude Include="..\..\src\libtsduck\tsConfigFile.h" />
     <ClInclude Include="..\..\src\libtsduck\tsConfigSection.h" />
@@ -156,6 +159,10 @@
     <ClInclude Include="..\..\src\libtsduck\tsEacemPreferredNameIdentifierDescriptor.h" />
     <ClInclude Include="..\..\src\libtsduck\tsEacemPreferredNameListDescriptor.h" />
     <ClInclude Include="..\..\src\libtsduck\tsEacemStreamIdentifierDescriptor.h" />
+    <ClInclude Include="..\..\src\libtsduck\tsEASAudioFileDescriptor.h" />
+    <ClInclude Include="..\..\src\libtsduck\tsEASInbandDetailsChannelDescriptor.h" />
+    <ClInclude Include="..\..\src\libtsduck\tsEASInbandExceptionChannelsDescriptor.h" />
+    <ClInclude Include="..\..\src\libtsduck\tsEASMetadataDescriptor.h" />
     <ClInclude Include="..\..\src\libtsduck\tsECB.h" />
     <ClInclude Include="..\..\src\libtsduck\tsECBTemplate.h" />
     <ClInclude Include="..\..\src\libtsduck\tsECMGClient.h" />
@@ -173,6 +180,7 @@
     <ClInclude Include="..\..\src\libtsduck\tsETID.h" />
     <ClInclude Include="..\..\src\libtsduck\tsEutelsatChannelNumberDescriptor.h" />
     <ClInclude Include="..\..\src\libtsduck\tsException.h" />
+    <ClInclude Include="..\..\src\libtsduck\tsExtendedChannelNameDescriptor.h" />
     <ClInclude Include="..\..\src\libtsduck\tsExtendedEventDescriptor.h" />
     <ClInclude Include="..\..\src\libtsduck\tsExternalApplicationAuthorizationDescriptor.h" />
     <ClInclude Include="..\..\src\libtsduck\tsExternalESIdDescriptor.h" />
@@ -343,6 +351,7 @@
     <ClInclude Include="..\..\src\libtsduck\tsServiceDiscovery.h" />
     <ClInclude Include="..\..\src\libtsduck\tsServiceIdentifierDescriptor.h" />
     <ClInclude Include="..\..\src\libtsduck\tsServiceListDescriptor.h" />
+    <ClInclude Include="..\..\src\libtsduck\tsServiceLocationDescriptor.h" />
     <ClInclude Include="..\..\src\libtsduck\tsServiceMoveDescriptor.h" />
     <ClInclude Include="..\..\src\libtsduck\tsServiceRelocatedDescriptor.h" />
     <ClInclude Include="..\..\src\libtsduck\tsServiceTemplate.h" />
@@ -565,6 +574,7 @@
     <ClCompile Include="..\..\src\libtsduck\tsArgsWithPlugins.cpp" />
     <ClCompile Include="..\..\src\libtsduck\tsAssociationTagDescriptor.cpp" />
     <ClCompile Include="..\..\src\libtsduck\tsAsyncReport.cpp" />
+    <ClCompile Include="..\..\src\libtsduck\tsATSCMultipleString.cpp" />
     <ClCompile Include="..\..\src\libtsduck\tsAudioAttributes.cpp" />
     <ClCompile Include="..\..\src\libtsduck\tsAudioLanguageOptions.cpp" />
     <ClCompile Include="..\..\src\libtsduck\tsAudioPreselectionDescriptor.cpp" />
@@ -586,6 +596,7 @@
     <ClCompile Include="..\..\src\libtsduck\tsBouquetNameDescriptor.cpp" />
     <ClCompile Include="..\..\src\libtsduck\tsByteBlock.cpp" />
     <ClCompile Include="..\..\src\libtsduck\tsCableDeliverySystemDescriptor.cpp" />
+    <ClCompile Include="..\..\src\libtsduck\tsCableEmergencyAlertTable.cpp" />
     <ClCompile Include="..\..\src\libtsduck\tsCADescriptor.cpp" />
     <ClCompile Include="..\..\src\libtsduck\tsCAIdentifierDescriptor.cpp" />
     <ClCompile Include="..\..\src\libtsduck\tsCarouselIdentifierDescriptor.cpp" />
@@ -599,6 +610,7 @@
     <ClCompile Include="..\..\src\libtsduck\tsCipherChaining.cpp" />
     <ClCompile Include="..\..\src\libtsduck\tsCOM.cpp" />
     <ClCompile Include="..\..\src\libtsduck\tsComponentDescriptor.cpp" />
+    <ClCompile Include="..\..\src\libtsduck\tsComponentNameDescriptor.cpp" />
     <ClCompile Include="..\..\src\libtsduck\tsCondition.cpp" />
     <ClCompile Include="..\..\src\libtsduck\tsConfigFile.cpp" />
     <ClCompile Include="..\..\src\libtsduck\tsConfigSection.cpp" />
@@ -650,6 +662,10 @@
     <ClCompile Include="..\..\src\libtsduck\tsEacemPreferredNameIdentifierDescriptor.cpp" />
     <ClCompile Include="..\..\src\libtsduck\tsEacemPreferredNameListDescriptor.cpp" />
     <ClCompile Include="..\..\src\libtsduck\tsEacemStreamIdentifierDescriptor.cpp" />
+    <ClCompile Include="..\..\src\libtsduck\tsEASAudioFileDescriptor.cpp" />
+    <ClCompile Include="..\..\src\libtsduck\tsEASInbandDetailsChannelDescriptor.cpp" />
+    <ClCompile Include="..\..\src\libtsduck\tsEASInbandExceptionChannelsDescriptor.cpp" />
+    <ClCompile Include="..\..\src\libtsduck\tsEASMetadataDescriptor.cpp" />
     <ClCompile Include="..\..\src\libtsduck\tsECMGClient.cpp" />
     <ClCompile Include="..\..\src\libtsduck\tsECMGClientArgs.cpp" />
     <ClCompile Include="..\..\src\libtsduck\tsECMGClientHandlerInterface.cpp" />
@@ -663,6 +679,7 @@
     <ClCompile Include="..\..\src\libtsduck\tsEnumeration.cpp" />
     <ClCompile Include="..\..\src\libtsduck\tsEutelsatChannelNumberDescriptor.cpp" />
     <ClCompile Include="..\..\src\libtsduck\tsException.cpp" />
+    <ClCompile Include="..\..\src\libtsduck\tsExtendedChannelNameDescriptor.cpp" />
     <ClCompile Include="..\..\src\libtsduck\tsExtendedEventDescriptor.cpp" />
     <ClCompile Include="..\..\src\libtsduck\tsExternalApplicationAuthorizationDescriptor.cpp" />
     <ClCompile Include="..\..\src\libtsduck\tsExternalESIdDescriptor.cpp" />
@@ -817,6 +834,7 @@
     <ClCompile Include="..\..\src\libtsduck\tsServiceDiscovery.cpp" />
     <ClCompile Include="..\..\src\libtsduck\tsServiceIdentifierDescriptor.cpp" />
     <ClCompile Include="..\..\src\libtsduck\tsServiceListDescriptor.cpp" />
+    <ClCompile Include="..\..\src\libtsduck\tsServiceLocationDescriptor.cpp" />
     <ClCompile Include="..\..\src\libtsduck\tsServiceMoveDescriptor.cpp" />
     <ClCompile Include="..\..\src\libtsduck\tsServiceRelocatedDescriptor.cpp" />
     <ClCompile Include="..\..\src\libtsduck\tsSHA1.cpp" />

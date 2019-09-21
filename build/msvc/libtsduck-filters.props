@@ -145,6 +145,9 @@
     <ClInclude Include="..\..\src\libtsduck\tsAsyncReport.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\libtsduck\tsATSCMultipleString.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\src\libtsduck\tsAudioAttributes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -214,6 +217,9 @@
     <ClInclude Include="..\..\src\libtsduck\tsCableDeliverySystemDescriptor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\libtsduck\tsCableEmergencyAlertTable.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\src\libtsduck\tsCADescriptor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -266,6 +272,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\libtsduck\tsComponentDescriptor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\libtsduck\tsComponentNameDescriptor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\libtsduck\tsCondition.h">
@@ -466,6 +475,18 @@
     <ClInclude Include="..\..\src\libtsduck\tsEacemStreamIdentifierDescriptor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\libtsduck\tsEASAudioFileDescriptor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\libtsduck\tsEASInbandDetailsChannelDescriptor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\libtsduck\tsEASInbandExceptionChannelsDescriptor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\libtsduck\tsEASMetadataDescriptor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\src\libtsduck\tsECB.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -515,6 +536,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\libtsduck\tsException.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\libtsduck\tsExtendedChannelNameDescriptor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\libtsduck\tsExtendedEventDescriptor.h">
@@ -1025,6 +1049,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\libtsduck\tsServiceListDescriptor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\libtsduck\tsServiceLocationDescriptor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\libtsduck\tsServiceMoveDescriptor.h">
@@ -1689,6 +1716,9 @@
     <ClCompile Include="..\..\src\libtsduck\tsAsyncReport.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\libtsduck\tsATSCMultipleString.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\src\libtsduck\tsAudioAttributes.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -1752,6 +1782,9 @@
     <ClCompile Include="..\..\src\libtsduck\tsCableDeliverySystemDescriptor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\libtsduck\tsCableEmergencyAlertTable.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\src\libtsduck\tsCADescriptor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -1789,6 +1822,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\libtsduck\tsComponentDescriptor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\libtsduck\tsComponentNameDescriptor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\libtsduck\tsCondition.cpp">
@@ -1944,6 +1980,18 @@
     <ClCompile Include="..\..\src\libtsduck\tsEacemStreamIdentifierDescriptor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\libtsduck\tsEASAudioFileDescriptor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\libtsduck\tsEASInbandDetailsChannelDescriptor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\libtsduck\tsEASInbandExceptionChannelsDescriptor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\libtsduck\tsEASMetadataDescriptor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\src\libtsduck\tsECMGClient.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -1981,6 +2029,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\libtsduck\tsException.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\libtsduck\tsExtendedChannelNameDescriptor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\libtsduck\tsExtendedEventDescriptor.cpp">
@@ -2443,6 +2494,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\libtsduck\tsServiceListDescriptor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\libtsduck\tsServiceLocationDescriptor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\libtsduck\tsServiceMoveDescriptor.cpp">

@@ -47,6 +47,7 @@ HEADERS += \
     ../../../src/libtsduck/tsArgsWithPlugins.h \
     ../../../src/libtsduck/tsAssociationTagDescriptor.h \
     ../../../src/libtsduck/tsAsyncReport.h \
+    ../../../src/libtsduck/tsATSCMultipleString.h \
     ../../../src/libtsduck/tsAudioAttributes.h \
     ../../../src/libtsduck/tsAudioLanguageOptions.h \
     ../../../src/libtsduck/tsAudioPreselectionDescriptor.h \
@@ -70,6 +71,7 @@ HEADERS += \
     ../../../src/libtsduck/tsBouquetNameDescriptor.h \
     ../../../src/libtsduck/tsByteBlock.h \
     ../../../src/libtsduck/tsCableDeliverySystemDescriptor.h \
+    ../../../src/libtsduck/tsCableEmergencyAlertTable.h \
     ../../../src/libtsduck/tsCADescriptor.h \
     ../../../src/libtsduck/tsCAIdentifierDescriptor.h \
     ../../../src/libtsduck/tsCarouselIdentifierDescriptor.h \
@@ -88,6 +90,7 @@ HEADERS += \
     ../../../src/libtsduck/tsCipherChainingTemplate.h \
     ../../../src/libtsduck/tsCOM.h \
     ../../../src/libtsduck/tsComponentDescriptor.h \
+    ../../../src/libtsduck/tsComponentNameDescriptor.h \
     ../../../src/libtsduck/tsCondition.h \
     ../../../src/libtsduck/tsConfigFile.h \
     ../../../src/libtsduck/tsConfigSection.h \
@@ -154,6 +157,10 @@ HEADERS += \
     ../../../src/libtsduck/tsEacemPreferredNameIdentifierDescriptor.h \
     ../../../src/libtsduck/tsEacemPreferredNameListDescriptor.h \
     ../../../src/libtsduck/tsEacemStreamIdentifierDescriptor.h \
+    ../../../src/libtsduck/tsEASAudioFileDescriptor.h \
+    ../../../src/libtsduck/tsEASInbandDetailsChannelDescriptor.h \
+    ../../../src/libtsduck/tsEASInbandExceptionChannelsDescriptor.h \
+    ../../../src/libtsduck/tsEASMetadataDescriptor.h \
     ../../../src/libtsduck/tsECB.h \
     ../../../src/libtsduck/tsECBTemplate.h \
     ../../../src/libtsduck/tsECMGClient.h \
@@ -171,6 +178,7 @@ HEADERS += \
     ../../../src/libtsduck/tsETID.h \
     ../../../src/libtsduck/tsEutelsatChannelNumberDescriptor.h \
     ../../../src/libtsduck/tsException.h \
+    ../../../src/libtsduck/tsExtendedChannelNameDescriptor.h \
     ../../../src/libtsduck/tsExtendedEventDescriptor.h \
     ../../../src/libtsduck/tsExternalApplicationAuthorizationDescriptor.h \
     ../../../src/libtsduck/tsExternalESIdDescriptor.h \
@@ -341,6 +349,7 @@ HEADERS += \
     ../../../src/libtsduck/tsServiceDiscovery.h \
     ../../../src/libtsduck/tsServiceIdentifierDescriptor.h \
     ../../../src/libtsduck/tsServiceListDescriptor.h \
+    ../../../src/libtsduck/tsServiceLocationDescriptor.h \
     ../../../src/libtsduck/tsServiceMoveDescriptor.h \
     ../../../src/libtsduck/tsServiceRelocatedDescriptor.h \
     ../../../src/libtsduck/tsServiceTemplate.h \
@@ -553,6 +562,7 @@ SOURCES += \
     ../../../src/libtsduck/tsArgsWithPlugins.cpp \
     ../../../src/libtsduck/tsAssociationTagDescriptor.cpp \
     ../../../src/libtsduck/tsAsyncReport.cpp \
+    ../../../src/libtsduck/tsATSCMultipleString.cpp \
     ../../../src/libtsduck/tsAudioAttributes.cpp \
     ../../../src/libtsduck/tsAudioLanguageOptions.cpp \
     ../../../src/libtsduck/tsAudioPreselectionDescriptor.cpp \
@@ -574,6 +584,7 @@ SOURCES += \
     ../../../src/libtsduck/tsBouquetNameDescriptor.cpp \
     ../../../src/libtsduck/tsByteBlock.cpp \
     ../../../src/libtsduck/tsCableDeliverySystemDescriptor.cpp \
+    ../../../src/libtsduck/tsCableEmergencyAlertTable.cpp \
     ../../../src/libtsduck/tsCADescriptor.cpp \
     ../../../src/libtsduck/tsCAIdentifierDescriptor.cpp \
     ../../../src/libtsduck/tsCarouselIdentifierDescriptor.cpp \
@@ -587,6 +598,7 @@ SOURCES += \
     ../../../src/libtsduck/tsCipherChaining.cpp \
     ../../../src/libtsduck/tsCOM.cpp \
     ../../../src/libtsduck/tsComponentDescriptor.cpp \
+    ../../../src/libtsduck/tsComponentNameDescriptor.cpp \
     ../../../src/libtsduck/tsCondition.cpp \
     ../../../src/libtsduck/tsConfigFile.cpp \
     ../../../src/libtsduck/tsConfigSection.cpp \
@@ -638,6 +650,10 @@ SOURCES += \
     ../../../src/libtsduck/tsEacemPreferredNameIdentifierDescriptor.cpp \
     ../../../src/libtsduck/tsEacemPreferredNameListDescriptor.cpp \
     ../../../src/libtsduck/tsEacemStreamIdentifierDescriptor.cpp \
+    ../../../src/libtsduck/tsEASAudioFileDescriptor.cpp \
+    ../../../src/libtsduck/tsEASInbandDetailsChannelDescriptor.cpp \
+    ../../../src/libtsduck/tsEASInbandExceptionChannelsDescriptor.cpp \
+    ../../../src/libtsduck/tsEASMetadataDescriptor.cpp \
     ../../../src/libtsduck/tsECMGClient.cpp \
     ../../../src/libtsduck/tsECMGClientArgs.cpp \
     ../../../src/libtsduck/tsECMGClientHandlerInterface.cpp \
@@ -651,6 +667,7 @@ SOURCES += \
     ../../../src/libtsduck/tsEnumeration.cpp \
     ../../../src/libtsduck/tsEutelsatChannelNumberDescriptor.cpp \
     ../../../src/libtsduck/tsException.cpp \
+    ../../../src/libtsduck/tsExtendedChannelNameDescriptor.cpp \
     ../../../src/libtsduck/tsExtendedEventDescriptor.cpp \
     ../../../src/libtsduck/tsExternalApplicationAuthorizationDescriptor.cpp \
     ../../../src/libtsduck/tsExternalESIdDescriptor.cpp \
@@ -805,6 +822,7 @@ SOURCES += \
     ../../../src/libtsduck/tsServiceDiscovery.cpp \
     ../../../src/libtsduck/tsServiceIdentifierDescriptor.cpp \
     ../../../src/libtsduck/tsServiceListDescriptor.cpp \
+    ../../../src/libtsduck/tsServiceLocationDescriptor.cpp \
     ../../../src/libtsduck/tsServiceMoveDescriptor.cpp \
     ../../../src/libtsduck/tsServiceRelocatedDescriptor.cpp \
     ../../../src/libtsduck/tsSHA1.cpp \

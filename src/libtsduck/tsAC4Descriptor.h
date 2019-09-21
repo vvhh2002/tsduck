@@ -28,7 +28,7 @@
 //----------------------------------------------------------------------------
 //!
 //!  @file
-//!  Representation of an AC-4_descriptor
+//!  Representation of a DVB AC-4_descriptor
 //!
 //----------------------------------------------------------------------------
 
@@ -38,7 +38,7 @@
 
 namespace ts {
     //!
-    //! Representation of an AC-4_descriptor.
+    //! Representation of a DVB AC-4_descriptor.
     //! @see ETSI 300 468, D.7.
     //! @ingroup descriptor
     //!
@@ -66,8 +66,11 @@ namespace ts {
         // Inherited methods
         virtual void serialize(DuckContext&, Descriptor&) const override;
         virtual void deserialize(DuckContext&, const Descriptor&) override;
-        virtual void buildXML(DuckContext&, xml::Element*) const override;
         virtual void fromXML(DuckContext&, const xml::Element*) override;
         DeclareDisplayDescriptor();
+
+    protected:
+        // Inherited methods
+        virtual void buildXML(DuckContext&, xml::Element*) const override;
     };
 }
