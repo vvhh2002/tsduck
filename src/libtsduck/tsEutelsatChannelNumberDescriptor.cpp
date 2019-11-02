@@ -26,11 +26,6 @@
 // THE POSSIBILITY OF SUCH DAMAGE.
 //
 //----------------------------------------------------------------------------
-//
-//  Representation of a logical_channel_number_descriptor.
-//  Private descriptor, must be preceeded by the EACEM/EICTA PDS.
-//
-//----------------------------------------------------------------------------
 
 #include "tsEutelsatChannelNumberDescriptor.h"
 #include "tsDescriptor.h"
