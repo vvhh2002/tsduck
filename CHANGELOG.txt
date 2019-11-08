@@ -2,10 +2,11 @@ TSDUCK CHANGE LOG AND RELEASE NOTES
 
 -------------------------------------------------------------------------------
 
-VERSION 3.19-1480
+VERSION 3.19-1486
 
 [IMP] Improvements on existing commands and plugins:
 
+  * Added option --receive-timeout to "tsp".
   * Added options --aes-cbc, --aes-ctr, --iv, --ctr-counter-bits,
     --output-cw-file to plugins "scrambler" and "descrambler".
   * Added option --swap-cw to plugin "descrambler".
@@ -15,6 +16,9 @@ VERSION 3.19-1480
   * Added option --extensions to "tsversion" and "tstabcomp".
   * Complete ATSC signalization, as defined in A/65, is now supported.
   * NorDig-private descriptors are supported.
+  * Added option --power-mode to "tsdektec" and output plugin "dektec".
+  * Service id or name is now optional in plugin "svrename". When omitted, the
+    default service is the first one in the PAT.
   * On Linux, multi-standard tuners are now supported (for instance tuners
     which support DVB-T and DVB-C). The options --delivery-system is used
     to select the appropriate type. Multi-standard tuners are not supported
@@ -26,6 +30,7 @@ VERSION 3.19-1480
     was requested.
   * In plugin "continuity", packets were incorrectly detected as duplicate
     when they had the same continuity counter but distinct content.
+  * Fixed HEVC_video_descriptor to latest version of ISO 13818-1 standard.
 
 -------------------------------------------------------------------------------
 

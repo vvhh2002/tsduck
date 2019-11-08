@@ -375,26 +375,38 @@ namespace ts {
 
     //!
     //! Size in bits of a PTS (Presentation Time Stamp) or DTS (Decoding Time Stamp).
+    //! Unlike PCR, PTS and DTS are regular 33-bit binary values, wrapping up at 2^33.
     //!
     constexpr size_t PTS_DTS_BIT_SIZE = 33;
 
     //!
-    //! Scale factor for PTS and DTS values (wrap up at 2**33).
+    //! Scale factor for PTS and DTS values (wrap up at 2^33).
     //!
     constexpr uint64_t PTS_DTS_SCALE = TS_UCONST64(1) << PTS_DTS_BIT_SIZE;
 
     //!
-    //! Mask for PTS and DTS values (wrap up at 2**33).
+    //! Mask for PTS and DTS values (wrap up at 2^33).
     //!
     constexpr uint64_t PTS_DTS_MASK = PTS_DTS_SCALE - 1;
+
+    //!
+    //! The maximum value possible for a PTS/DTS value.
+    //!
+    constexpr uint64_t MAX_PTS_DTS = PTS_DTS_SCALE - 1;
 
     //!
     //! Scale factor for PCR values.
     //! This is not a power of 2, it does not wrap up at a number of bits.
     //! The PCR_base part is equivalent to a PTS/DTS and wraps up at 2**33.
-    //! The PCR_ext part is a mod 300 value.
+    //! The PCR_ext part is a mod 300 value. Note that, since this not a
+    //! power of 2, there is no possible PCR_MASK value.
     //!
     constexpr uint64_t PCR_SCALE = PTS_DTS_SCALE * SYSTEM_CLOCK_SUBFACTOR;
+
+    //!
+    //! The maximum value possible for a PCR (Program Clock Reference) value.
+    //!
+    constexpr uint64_t MAX_PCR = PCR_SCALE - 1;
 
     //!
     //! An invalid PCR (Program Clock Reference) value, can be used as a marker.
@@ -412,25 +424,12 @@ namespace ts {
     constexpr uint64_t INVALID_DTS = TS_UCONST64(0xFFFFFFFFFFFFFFFF);
 
     //!
-    //! The maximum value possible for a PCR (Program Clock Reference) value.
-    //! This is arrived at as follows:  (max PCR_base * 300) + max PCR_ext
-    //! PCR_base is represented by 33 bits, so max PCR_base = 2^33 - 1
-    //! PCR_ext is represented by 9 bits; however, it may only have values
-    //! 0-299 per specification.  As such, the maximum PCR is:
-    //! (2^33 - 1) * 300 + 299.
-    //!
-    constexpr uint64_t MAX_PCR = TS_UCONST64(2576980377599);
-
-    //!
-    //! The maximum value possible for a PTS/DTS value.
-    //!
-    constexpr uint64_t MAX_PTS_DTS = PTS_DTS_MASK;
-
-    //!
     //! Check if PCR2 follows PCR1 after wrap up.
     //! @param [in] pcr1 First PCR.
     //! @param [in] pcr2 Second PCR.
     //! @return True is @a pcr2 is probably following @a pcr1 after wrapping up.
+    //! The exact criteria is that @a pcr2 wraps up after @a pcr1 and their
+    //! distance is within 20% of a full PCR range.
     //!
     TSDUCKDLL inline bool WrapUpPCR(uint64_t pcr1, uint64_t pcr2)
     {
@@ -460,7 +459,7 @@ namespace ts {
     //! Check if PTS2 follows PTS1 after wrap up.
     //! @param [in] pts1 First PTS.
     //! @param [in] pts2 Second PTS.
-    //! @return True is @a pts2 is probably following @a pts1 after wrapping up at 2**33.
+    //! @return True is @a pts2 is probably following @a pts1 after wrapping up at 2^33.
     //!
     TSDUCKDLL inline bool WrapUpPTS(uint64_t pts1, uint64_t pts2)
     {
@@ -802,6 +801,10 @@ namespace ts {
         TID_MP4SDT        = 0x04, //!< Table id for MPEG-4 Scene Description Table
         TID_MP4ODT        = 0x05, //!< Table id for MPEG-4 Object Descriptor Table
         TID_MDT           = 0x06, //!< Table id for MetaData Table
+        TID_IPMP_CT       = 0x07, //!< Table id for IPMP Control Information Table (ISO/IEC 13818-11)
+        TID_ISO_14496     = 0x08, //!< Table id for ISO/IEC-14496 Table
+        TID_ISO_23001_11  = 0x09, //!< Table id for ISO/IEC 23001-11 Green Access Unit Table
+        TID_ISO_23001_10  = 0x0A, //!< Table id for ISO/IEC 23001-10 Quality Access Unit Table
         TID_DSMCC_MPE     = 0x3A, //!< Table id for DSM-CC Multi-Protocol Encapsulated data
         TID_DSMCC_UNM     = 0x3B, //!< Table id for DSM-CC User-to-Network Messages
         TID_DSMCC_DDM     = 0x3C, //!< Table id for DSM-CC Download Data Messages
@@ -1299,6 +1302,19 @@ namespace ts {
     enum : DID {
         MPEG_EDID_OBJ_DESC_UPD  = 0x02, //!< Ext.DID for ObjectDescriptorUpdate.
         MPEG_EDID_HEVC_TIM_HRD  = 0x03, //!< Ext.DID for HEVC_timing_and_HRD_descriptor.
+        MPEG_EDID_AF_EXT        = 0x04, //!< Ext.DID for AF_extensions_descriptor
+        MPEG_EDID_HEVC_OP_POINT = 0x05, //!< Ext.DID for HEVC_operation_point_descriptor
+        MPEG_EDID_HEVC_HIER_EXT = 0x06, //!< Ext.DID for HEVC_hierarchy_extension_descriptor
+        MPEG_EDID_GREEN_EXT     = 0x07, //!< Ext.DID for green_extension_descriptor
+        MPEG_EDID_MPH3D_AUDIO   = 0x08, //!< Ext.DID for MPEGH_3D_audio_descriptor
+        MPEG_EDID_MPH3D_CONFIG  = 0x09, //!< Ext.DID for MPEGH_3D_audio_config_descriptor
+        MPEG_EDID_MPH3D_SCENE   = 0x0A, //!< Ext.DID for MPEGH_3D_audio_scene_descriptor
+        MPEG_EDID_MPH3D_TEXT    = 0x0B, //!< Ext.DID for MPEGH_3D_audio_text_label_descriptor
+        MPEG_EDID_MPH3D_MULTI   = 0x0C, //!< Ext.DID for MPEGH_3D_audio_multi_stream_descriptor
+        MPEG_EDID_MPH3D_DRCLOUD = 0x0D, //!< Ext.DID for MPEGH_3D_audio_DRC_loudness_descriptor
+        MPEG_EDID_MPH3D_COMMAND = 0x0E, //!< Ext.DID for MPEGH_3D_audio_command_descriptor
+        MPEG_EDID_QUALITY_EXT   = 0x0F, //!< Ext.DID for quality_extension_descriptor
+        MPEG_EDID_VIRT_SEGMENT  = 0x10, //!< Ext.DID for virtual_segmentation_descriptor
         MPEG_EDID_NULL          = 0xFF, //!< Invalid EDID value, can be used as placeholder.
     };
 
