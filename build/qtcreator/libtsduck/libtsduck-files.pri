@@ -386,6 +386,7 @@ HEADERS += \
     ../../../src/libtsduck/tsSimpleApplicationLocationDescriptor.h \
     ../../../src/libtsduck/tsSimulCryptDate.h \
     ../../../src/libtsduck/tsSingletonManager.h \
+    ../../../src/libtsduck/tsSkyLogicalChannelNumberDescriptor.h \
     ../../../src/libtsduck/tsSLDescriptor.h \
     ../../../src/libtsduck/tsSmoothingBufferDescriptor.h \
     ../../../src/libtsduck/tsSocket.h \
@@ -458,6 +459,7 @@ HEADERS += \
     ../../../src/libtsduck/tsThread.h \
     ../../../src/libtsduck/tsThreadAttributes.h \
     ../../../src/libtsduck/tsTime.h \
+    ../../../src/libtsduck/tsTimeShiftBuffer.h \
     ../../../src/libtsduck/tsTimeShiftedEventDescriptor.h \
     ../../../src/libtsduck/tsTimeSliceFECIdentifierDescriptor.h \
     ../../../src/libtsduck/tsTimeTrackerDemux.h \
@@ -482,9 +484,8 @@ HEADERS += \
     ../../../src/libtsduck/tsTSAnalyzerOptions.h \
     ../../../src/libtsduck/tsTSAnalyzerReport.h \
     ../../../src/libtsduck/tsTSDT.h \
-    ../../../src/libtsduck/tsTSFileInput.h \
+    ../../../src/libtsduck/tsTSFile.h \
     ../../../src/libtsduck/tsTSFileInputBuffered.h \
-    ../../../src/libtsduck/tsTSFileOutput.h \
     ../../../src/libtsduck/tsTSFileOutputResync.h \
     ../../../src/libtsduck/tsTSPacket.h \
     ../../../src/libtsduck/tsTSPacketMetadata.h \
@@ -529,6 +530,7 @@ HEADERS += \
     ../../../src/libtsduck/tsxmlText.h \
     ../../../src/libtsduck/tsxmlTweaks.h \
     ../../../src/libtsduck/tsxmlUnknown.h \
+    ../../../src/libtsduck/private/DtCapsNames.h \
     ../../../src/libtsduck/private/tsDektec.h \
     ../../../src/libtsduck/private/tsDektecDevice.h \
     ../../../src/libtsduck/private/tsDektecVPD.h \
@@ -872,6 +874,7 @@ SOURCES += \
     ../../../src/libtsduck/tsSimpleApplicationLocationDescriptor.cpp \
     ../../../src/libtsduck/tsSimulCryptDate.cpp \
     ../../../src/libtsduck/tsSingletonManager.cpp \
+    ../../../src/libtsduck/tsSkyLogicalChannelNumberDescriptor.cpp \
     ../../../src/libtsduck/tsSLDescriptor.cpp \
     ../../../src/libtsduck/tsSmoothingBufferDescriptor.cpp \
     ../../../src/libtsduck/tsSocket.cpp \
@@ -940,6 +943,7 @@ SOURCES += \
     ../../../src/libtsduck/tsThread.cpp \
     ../../../src/libtsduck/tsThreadAttributes.cpp \
     ../../../src/libtsduck/tsTime.cpp \
+    ../../../src/libtsduck/tsTimeShiftBuffer.cpp \
     ../../../src/libtsduck/tsTimeShiftedEventDescriptor.cpp \
     ../../../src/libtsduck/tsTimeSliceFECIdentifierDescriptor.cpp \
     ../../../src/libtsduck/tsTimeTrackerDemux.cpp \
@@ -959,9 +963,8 @@ SOURCES += \
     ../../../src/libtsduck/tsTSAnalyzerOptions.cpp \
     ../../../src/libtsduck/tsTSAnalyzerReport.cpp \
     ../../../src/libtsduck/tsTSDT.cpp \
-    ../../../src/libtsduck/tsTSFileInput.cpp \
+    ../../../src/libtsduck/tsTSFile.cpp \
     ../../../src/libtsduck/tsTSFileInputBuffered.cpp \
-    ../../../src/libtsduck/tsTSFileOutput.cpp \
     ../../../src/libtsduck/tsTSFileOutputResync.cpp \
     ../../../src/libtsduck/tsTSPacket.cpp \
     ../../../src/libtsduck/tsTSPacketMetadata.cpp \

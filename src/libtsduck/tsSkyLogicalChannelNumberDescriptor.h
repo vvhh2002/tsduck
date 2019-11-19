@@ -1,7 +1,7 @@
 //----------------------------------------------------------------------------
 //
 // TSDuck - The MPEG Transport Stream Toolkit
-// Copyright (c) 2005-2019, Thierry Lelegard
+// Copyright (c) 2019, Anthony Delannoy
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -28,8 +28,8 @@
 //----------------------------------------------------------------------------
 //!
 //!  @file
-//!  Representation of a HD_simulcast_logical_channel_descriptor.
-//!  This is a private descriptor, must be preceeded by the EACEM/EICTA PDS.
+//!  Representation of a sky_logical_channel_number_descriptor.
+//!  This is a private descriptor, must be preceeded by the BskyB PDS.
 //!
 //----------------------------------------------------------------------------
 
@@ -38,12 +38,12 @@
 
 namespace ts {
     //!
-    //! Representation of a HD_simulcast_logical_channel_descriptor.
+    //! Representation of a sky_logical_channel_number_descriptor.
     //!
-    //! This is a private descriptor, must be preceeded by the EACEM/EICTA PDS.
+    //! This is a private descriptor, must be preceeded by the BskyB PDS.
     //! @ingroup descriptor
     //!
-    class TSDUCKDLL HDSimulcastLogicalChannelDescriptor : public AbstractDescriptor
+    class TSDUCKDLL SkyLogicalChannelNumberDescriptor : public AbstractDescriptor
     {
     public:
         //!
@@ -52,20 +52,27 @@ namespace ts {
         struct TSDUCKDLL Entry
         {
             // Public members
-            uint16_t service_id;  //!< Service id.
-            bool     visible;     //!< Service is visible.
-            uint16_t lcn;         //!< Logical channel number.
+            uint16_t service_id;   //!< Service id.
+            uint8_t  service_type; //!< Service type.
+            uint16_t channel_id;   //!< Channel id
+            uint16_t lcn;          //!< Logical channel number.
+            uint16_t sky_id;       //!< Sky channel number.
 
             //!
             //! Constructor
             //! @param [in] id_ Service id.
-            //! @param [in] visible_ Service is visible.
+            //! @param [in] type_ Service type.
+            //! @param [in] cid_ Channel id.
             //! @param [in] lcn_ Logical channel number.
+            //! @param [in] skyid_ Sky id.
             //!
-            Entry(uint16_t id_ = 0, bool visible_ = true, uint16_t lcn_ = 0):
+            Entry(uint16_t id_ = 0, uint8_t type_ = 0, uint16_t cid_ = 0,
+                  uint16_t lcn_ = 0, uint16_t skyid_ = 0):
                 service_id(id_),
-                visible(visible_),
-                lcn(lcn_)
+                service_type(type_),
+                channel_id(cid_),
+                lcn(lcn_),
+                sky_id(skyid_)
             {
             }
         };
@@ -78,31 +85,29 @@ namespace ts {
         //!
         //! Maximum number of services entries to fit in 255 bytes.
         //!
-        static const size_t MAX_ENTRIES = 63;
+        static const size_t MAX_ENTRIES = 28;
 
-        // HDSimulcastLogicalChannelDescriptor public members:
+        // SkyLogicalChannelNumberDescriptor public members:
         EntryList entries;  //!< List of service entries.
+        uint16_t region_id; //!< Region id (maybe in the UK?, 0xFFFF for all country).
 
         //!
         //! Default constructor.
         //!
-        HDSimulcastLogicalChannelDescriptor();
+        SkyLogicalChannelNumberDescriptor();
 
         //!
         //! Constructor from a binary descriptor
         //! @param [in,out] duck TSDuck execution context.
         //! @param [in] bin A binary descriptor to deserialize.
         //!
-        HDSimulcastLogicalChannelDescriptor(DuckContext& duck, const Descriptor& bin);
+        SkyLogicalChannelNumberDescriptor(DuckContext& duck, const Descriptor& bin);
 
         // Inherited methods
         virtual void serialize(DuckContext&, Descriptor&) const override;
         virtual void deserialize(DuckContext&, const Descriptor&) override;
+        virtual void buildXML(DuckContext&, xml::Element*) const override;
         virtual void fromXML(DuckContext&, const xml::Element*) override;
         DeclareDisplayDescriptor();
-
-    protected:
-        // Inherited methods
-        virtual void buildXML(DuckContext&, xml::Element*) const override;
     };
 }

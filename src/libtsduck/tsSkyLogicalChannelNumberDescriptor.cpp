@@ -1,7 +1,7 @@
 //----------------------------------------------------------------------------
 //
 // TSDuck - The MPEG Transport Stream Toolkit
-// Copyright (c) 2005-2019, Thierry Lelegard
+// Copyright (c) 2019, Anthony Delannoy
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -27,45 +27,43 @@
 //
 //----------------------------------------------------------------------------
 //
-//  Representation of a logical_channel_number_descriptor.
-//  Private descriptor, must be preceeded by the EACEM/EICTA PDS.
+//  Representation of a sky_logical_channel_number_descriptor.
+//  Private descriptor, must be preceeded by the BskyB PDS.
 //
 //----------------------------------------------------------------------------
 
-#include "tsLogicalChannelNumberDescriptor.h"
+#include "tsSkyLogicalChannelNumberDescriptor.h"
 #include "tsDescriptor.h"
+#include "tsNames.h"
 #include "tsTablesDisplay.h"
 #include "tsTablesFactory.h"
 #include "tsxmlElement.h"
 TSDUCK_SOURCE;
 
-#define MY_XML_NAME u"logical_channel_number_descriptor"
-#define MY_DID ts::DID_LOGICAL_CHANNEL_NUM
-#define MY_PDS ts::PDS_EACEM
+#define MY_XML_NAME u"sky_logical_channel_number_descriptor"
+#define MY_DID ts::DID_LOGICAL_CHANNEL_SKY
+#define MY_PDS ts::PDS_BSKYB
 #define MY_STD ts::STD_DVB
 
-TS_XML_DESCRIPTOR_FACTORY(ts::LogicalChannelNumberDescriptor, MY_XML_NAME);
-TS_ID_DESCRIPTOR_FACTORY(ts::LogicalChannelNumberDescriptor, ts::EDID::Private(MY_DID, MY_PDS));
-TS_FACTORY_REGISTER(ts::LogicalChannelNumberDescriptor::DisplayDescriptor, ts::EDID::Private(MY_DID, MY_PDS));
-
-// Incorrect use of TPS private data, TPS broadcasters should use EACEM/EICTA PDS instead.
-TS_ID_DESCRIPTOR_FACTORY(ts::LogicalChannelNumberDescriptor, ts::EDID::Private(MY_DID, ts::PDS_TPS));
-TS_FACTORY_REGISTER(ts::LogicalChannelNumberDescriptor::DisplayDescriptor, ts::EDID::Private(MY_DID, ts::PDS_TPS));
+TS_XML_DESCRIPTOR_FACTORY(ts::SkyLogicalChannelNumberDescriptor, MY_XML_NAME);
+TS_ID_DESCRIPTOR_FACTORY(ts::SkyLogicalChannelNumberDescriptor, ts::EDID::Private(MY_DID, MY_PDS));
+TS_FACTORY_REGISTER(ts::SkyLogicalChannelNumberDescriptor::DisplayDescriptor, ts::EDID::Private(MY_DID, MY_PDS));
 
 
 //----------------------------------------------------------------------------
 // Constructors
 //----------------------------------------------------------------------------
 
-ts::LogicalChannelNumberDescriptor::LogicalChannelNumberDescriptor() :
+ts::SkyLogicalChannelNumberDescriptor::SkyLogicalChannelNumberDescriptor() :
     AbstractDescriptor(MY_DID, MY_XML_NAME, MY_STD, MY_PDS),
-    entries()
+    entries(),
+    region_id(0)
 {
     _is_valid = true;
 }
 
-ts::LogicalChannelNumberDescriptor::LogicalChannelNumberDescriptor(DuckContext& duck, const Descriptor& desc) :
-    LogicalChannelNumberDescriptor()
+ts::SkyLogicalChannelNumberDescriptor::SkyLogicalChannelNumberDescriptor(DuckContext& duck, const Descriptor& desc) :
+    SkyLogicalChannelNumberDescriptor()
 {
     deserialize(duck, desc);
 }
@@ -75,12 +73,16 @@ ts::LogicalChannelNumberDescriptor::LogicalChannelNumberDescriptor(DuckContext& 
 // Serialization
 //----------------------------------------------------------------------------
 
-void ts::LogicalChannelNumberDescriptor::serialize(DuckContext& duck, Descriptor& desc) const
+void ts::SkyLogicalChannelNumberDescriptor::serialize(DuckContext& duck, Descriptor& desc) const
 {
     ByteBlockPtr bbp(serializeStart());
-    for (auto it = entries.begin(); it != entries.end(); ++it) {
-        bbp->appendUInt16(it->service_id);
-        bbp->appendUInt16((it->visible ? 0xFC00 : 0x7C00) | (it->lcn & 0x03FF));
+    bbp->appendUInt16(region_id);
+    for (EntryList::const_iterator it = entries.begin(); it != entries.end(); ++it) {
+        bbp->appendUInt16 (it->service_id);
+        bbp->appendUInt8  (it->service_type);
+        bbp->appendUInt16 (it->channel_id);
+        bbp->appendUInt16 (it->lcn);
+        bbp->appendUInt16 (it->sky_id);
     }
     serializeEnd(desc, bbp);
 }
@@ -90,18 +92,27 @@ void ts::LogicalChannelNumberDescriptor::serialize(DuckContext& duck, Descriptor
 // Deserialization
 //----------------------------------------------------------------------------
 
-void ts::LogicalChannelNumberDescriptor::deserialize(DuckContext& duck, const Descriptor& desc)
+void ts::SkyLogicalChannelNumberDescriptor::deserialize(DuckContext& duck, const Descriptor& desc)
 {
-    _is_valid = desc.isValid() && desc.tag() == _tag && desc.payloadSize() % 4 == 0;
+    _is_valid = desc.isValid() && desc.tag() == _tag && desc.payloadSize() % 9 == 2;
     entries.clear();
 
     if (_is_valid) {
         const uint8_t* data = desc.payload();
         size_t size = desc.payloadSize();
-        while (size >= 4) {
-            entries.push_back(Entry(GetUInt16(data), (data[2] & 0x80) != 0, GetUInt16(data + 2) & 0x03FF));
-            data += 4;
-            size -= 4;
+
+        region_id = GetUInt16(data);
+        data += 2; size -= 2;
+
+        while (size >= 9) {
+            uint16_t sid = GetUInt16(data);
+            uint8_t stype = GetUInt8(data + 2);
+            uint16_t channel_id = GetUInt16(data + 3);
+            uint16_t lcn_id = GetUInt16(data + 5);
+            uint16_t sky_id = GetUInt16(data + 7);
+
+            entries.push_back(Entry(sid, stype, channel_id, lcn_id, sky_id));
+            data += 9; size -= 9;
         }
     }
 }
@@ -111,18 +122,31 @@ void ts::LogicalChannelNumberDescriptor::deserialize(DuckContext& duck, const De
 // Static method to display a descriptor.
 //----------------------------------------------------------------------------
 
-void ts::LogicalChannelNumberDescriptor::DisplayDescriptor(TablesDisplay& display, DID did, const uint8_t* data, size_t size, int indent, TID tid, PDS pds)
+void ts::SkyLogicalChannelNumberDescriptor::DisplayDescriptor(TablesDisplay& display, DID did, const uint8_t* data, size_t size, int indent, TID tid, PDS pds)
 {
     std::ostream& strm(display.duck().out());
     const std::string margin(indent, ' ');
 
-    while (size >= 4) {
-        const uint16_t service = GetUInt16(data);
-        const uint8_t visible = (data[2] >> 7) & 0x01;
-        const uint16_t channel = GetUInt16(data + 2) & 0x03FF;
-        data += 4; size -= 4;
+    uint16_t region_id = GetUInt16(data);
+    data += 2; size -= 2;
+
+    strm << margin
+         << UString::Format(u"Region Id: %5d (0x%04X)", {region_id, region_id})
+         << std::endl;
+
+    while (size >= 9) {
+        const uint16_t service_id = GetUInt16(data);
+        const uint8_t service_type = GetUInt8(data + 2);
+        const uint16_t channel_id = GetUInt16(data + 3);
+        const uint16_t lcn_id = GetUInt16(data + 5);
+        const uint16_t sky_id = GetUInt16(data + 7);
+        data += 9; size -= 9;
+
         strm << margin
-             << UString::Format(u"Service Id: %5d (0x%04X), Visible: %1d, Channel number: %3d", {service, service, visible, channel})
+             << UString::Format(u"Service Id: %5d (0x%04X), Service Type: %s, Channel number: %3d, "
+                                 "Lcn: %5d, Sky Id: %5d (0x%04X)",
+                                 {service_id, service_id, names::ServiceType(service_type, names::FIRST),
+                                  channel_id, lcn_id, sky_id, sky_id})
              << std::endl;
     }
 
@@ -134,13 +158,17 @@ void ts::LogicalChannelNumberDescriptor::DisplayDescriptor(TablesDisplay& displa
 // XML serialization
 //----------------------------------------------------------------------------
 
-void ts::LogicalChannelNumberDescriptor::buildXML(DuckContext& duck, xml::Element* root) const
+void ts::SkyLogicalChannelNumberDescriptor::buildXML(DuckContext& duck, xml::Element* root) const
 {
+    root->setIntAttribute(u"region_id", region_id, true);
+
     for (EntryList::const_iterator it = entries.begin(); it != entries.end(); ++it) {
         xml::Element* e = root->addElement(u"service");
         e->setIntAttribute(u"service_id", it->service_id, true);
+        e->setIntAttribute(u"service_type", it->service_type, true);
+        e->setIntAttribute(u"channel_id", it->channel_id, true);
         e->setIntAttribute(u"logical_channel_number", it->lcn, false);
-        e->setBoolAttribute(u"visible_service", it->visible);
+        e->setIntAttribute(u"sky_id", it->sky_id, true);
     }
 }
 
@@ -149,21 +177,24 @@ void ts::LogicalChannelNumberDescriptor::buildXML(DuckContext& duck, xml::Elemen
 // XML deserialization
 //----------------------------------------------------------------------------
 
-void ts::LogicalChannelNumberDescriptor::fromXML(DuckContext& duck, const xml::Element* element)
+void ts::SkyLogicalChannelNumberDescriptor::fromXML(DuckContext& duck, const xml::Element* element)
 {
     entries.clear();
 
     xml::ElementVector children;
     _is_valid =
         checkXMLName(element) &&
+        element->getIntAttribute<uint16_t>(region_id, u"region_id", true, 0, 0x0000, 0xFFFF) &&
         element->getChildren(children, u"service", 0, MAX_ENTRIES);
 
     for (size_t i = 0; _is_valid && i < children.size(); ++i) {
         Entry entry;
         _is_valid =
             children[i]->getIntAttribute<uint16_t>(entry.service_id, u"service_id", true, 0, 0x0000, 0xFFFF) &&
-            children[i]->getIntAttribute<uint16_t>(entry.lcn, u"logical_channel_number", true, 0, 0x0000, 0x03FF) &&
-            children[i]->getBoolAttribute(entry.visible, u"visible_service", false, true);
+            children[i]->getIntAttribute<uint8_t>(entry.service_type, u"service_type", true, 0, 0x00, 0xFF) &&
+            children[i]->getIntAttribute<uint16_t>(entry.channel_id, u"channel_id", true, 0, 0x0000, 0xFFFF) &&
+            children[i]->getIntAttribute<uint16_t>(entry.lcn, u"logical_channel_number", true, 0, 0x0000, 0xFFFF) &&
+            children[i]->getIntAttribute<uint16_t>(entry.sky_id, u"sky_id", true, 0, 0x0000, 0xFFFF);
         if (_is_valid) {
             entries.push_back(entry);
         }
