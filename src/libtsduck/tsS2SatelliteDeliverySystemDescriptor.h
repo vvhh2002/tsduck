@@ -33,7 +33,7 @@
 //----------------------------------------------------------------------------
 
 #pragma once
-#include "tsAbstractDescriptor.h"
+#include "tsAbstractDeliverySystemDescriptor.h"
 
 namespace ts {
     //!
@@ -42,7 +42,7 @@ namespace ts {
     //! @see ETSI 300 468, 6.2.13.3.
     //! @ingroup descriptor
     //!
-    class TSDUCKDLL S2SatelliteDeliverySystemDescriptor : public AbstractDescriptor
+    class TSDUCKDLL S2SatelliteDeliverySystemDescriptor : public AbstractDeliverySystemDescriptor
     {
     public:
         // Public members:

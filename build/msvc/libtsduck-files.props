@@ -19,6 +19,7 @@
     <ClInclude Include="..\..\src\libtsduck\tsAbstractMultilingualDescriptor.h" />
     <ClInclude Include="..\..\src\libtsduck\tsAbstractOutputStream.h" />
     <ClInclude Include="..\..\src\libtsduck\tsAbstractSignalization.h" />
+    <ClInclude Include="..\..\src\libtsduck\tsAbstractSignalizationTemplate.h" />
     <ClInclude Include="..\..\src\libtsduck\tsAbstractTable.h" />
     <ClInclude Include="..\..\src\libtsduck\tsAbstractTablePlugin.h" />
     <ClInclude Include="..\..\src\libtsduck\tsAbstractTableTemplate.h" />
@@ -77,6 +78,8 @@
     <ClInclude Include="..\..\src\libtsduck\tsBlockCipherAlertInterface.h" />
     <ClInclude Include="..\..\src\libtsduck\tsBouquetNameDescriptor.h" />
     <ClInclude Include="..\..\src\libtsduck\tsByteBlock.h" />
+    <ClInclude Include="..\..\src\libtsduck\tsC2BundleDeliverySystemDescriptor.h" />
+    <ClInclude Include="..\..\src\libtsduck\tsC2DeliverySystemDescriptor.h" />
     <ClInclude Include="..\..\src\libtsduck\tsCableDeliverySystemDescriptor.h" />
     <ClInclude Include="..\..\src\libtsduck\tsCableEmergencyAlertTable.h" />
     <ClInclude Include="..\..\src\libtsduck\tsCADescriptor.h" />
@@ -91,6 +94,8 @@
     <ClInclude Include="..\..\src\libtsduck\tsCAT.h" />
     <ClInclude Include="..\..\src\libtsduck\tsCBC.h" />
     <ClInclude Include="..\..\src\libtsduck\tsCBCTemplate.h" />
+    <ClInclude Include="..\..\src\libtsduck\tsCellFrequencyLinkDescriptor.h" />
+    <ClInclude Include="..\..\src\libtsduck\tsCellListDescriptor.h" />
     <ClInclude Include="..\..\src\libtsduck\tsCerrReport.h" />
     <ClInclude Include="..\..\src\libtsduck\tsChannelFile.h" />
     <ClInclude Include="..\..\src\libtsduck\tsCIAncillaryDataDescriptor.h" />
@@ -148,6 +153,7 @@
     <ClInclude Include="..\..\src\libtsduck\tsDoubleCheckLock.h" />
     <ClInclude Include="..\..\src\libtsduck\tsDSMCCStreamDescriptorsTable.h" />
     <ClInclude Include="..\..\src\libtsduck\tsDTSDescriptor.h" />
+    <ClInclude Include="..\..\src\libtsduck\tsDTSHDDescriptor.h" />
     <ClInclude Include="..\..\src\libtsduck\tsDTSNeuralDescriptor.h" />
     <ClInclude Include="..\..\src\libtsduck\tsduck.h" />
     <ClInclude Include="..\..\src\libtsduck\tsDuckConfigFile.h" />
@@ -207,6 +213,7 @@
     <ClInclude Include="..\..\src\libtsduck\tsFileOutputPlugin.h" />
     <ClInclude Include="..\..\src\libtsduck\tsFilePacketPlugin.h" />
     <ClInclude Include="..\..\src\libtsduck\tsForkPipe.h" />
+    <ClInclude Include="..\..\src\libtsduck\tsFrequencyListDescriptor.h" />
     <ClInclude Include="..\..\src\libtsduck\tsGenreDescriptor.h" />
     <ClInclude Include="..\..\src\libtsduck\tsGitHubRelease.h" />
     <ClInclude Include="..\..\src\libtsduck\tsGraphicsConstraintsDescriptor.h" />
@@ -292,6 +299,7 @@
     <ClInclude Include="..\..\src\libtsduck\tsMutex.h" />
     <ClInclude Include="..\..\src\libtsduck\tsMutexInterface.h" />
     <ClInclude Include="..\..\src\libtsduck\tsNames.h" />
+    <ClInclude Include="..\..\src\libtsduck\tsNetworkChangeNotifyDescriptor.h" />
     <ClInclude Include="..\..\src\libtsduck\tsNetworkNameDescriptor.h" />
     <ClInclude Include="..\..\src\libtsduck\tsNIT.h" />
     <ClInclude Include="..\..\src\libtsduck\tsNorDigLogicalChannelDescriptorV1.h" />
@@ -355,6 +363,7 @@
     <ClInclude Include="..\..\src\libtsduck\tsRRT.h" />
     <ClInclude Include="..\..\src\libtsduck\tsRST.h" />
     <ClInclude Include="..\..\src\libtsduck\tsS2SatelliteDeliverySystemDescriptor.h" />
+    <ClInclude Include="..\..\src\libtsduck\tsS2XSatelliteDeliverySystemDescriptor.h" />
     <ClInclude Include="..\..\src\libtsduck\tsSafePtr.h" />
     <ClInclude Include="..\..\src\libtsduck\tsSafePtrTemplate.h" />
     <ClInclude Include="..\..\src\libtsduck\tsSatelliteDeliverySystemDescriptor.h" />
@@ -383,6 +392,7 @@
     <ClInclude Include="..\..\src\libtsduck\tsSHA256.h" />
     <ClInclude Include="..\..\src\libtsduck\tsSHA512.h" />
     <ClInclude Include="..\..\src\libtsduck\tsSharedLibrary.h" />
+    <ClInclude Include="..\..\src\libtsduck\tsSHDeliverySystemDescriptor.h" />
     <ClInclude Include="..\..\src\libtsduck\tsShortEventDescriptor.h" />
     <ClInclude Include="..\..\src\libtsduck\tsSimpleApplicationBoundaryDescriptor.h" />
     <ClInclude Include="..\..\src\libtsduck\tsSimpleApplicationLocationDescriptor.h" />
@@ -420,6 +430,7 @@
     <ClInclude Include="..\..\src\libtsduck\tsSystemRandomGenerator.h" />
     <ClInclude Include="..\..\src\libtsduck\tsSysUtils.h" />
     <ClInclude Include="..\..\src\libtsduck\tsSysUtilsTemplate.h" />
+    <ClInclude Include="..\..\src\libtsduck\tsT2DeliverySystemDescriptor.h" />
     <ClInclude Include="..\..\src\libtsduck\tsT2MIDemux.h" />
     <ClInclude Include="..\..\src\libtsduck\tsT2MIDescriptor.h" />
     <ClInclude Include="..\..\src\libtsduck\tsT2MIHandlerInterface.h" />
@@ -489,9 +500,11 @@
     <ClInclude Include="..\..\src\libtsduck\tsTSFile.h" />
     <ClInclude Include="..\..\src\libtsduck\tsTSFileInputBuffered.h" />
     <ClInclude Include="..\..\src\libtsduck\tsTSFileOutputResync.h" />
+    <ClInclude Include="..\..\src\libtsduck\tstsp.h" />
     <ClInclude Include="..\..\src\libtsduck\tsTSPacket.h" />
     <ClInclude Include="..\..\src\libtsduck\tsTSPacketMetadata.h" />
     <ClInclude Include="..\..\src\libtsduck\tsTSPacketQueue.h" />
+    <ClInclude Include="..\..\src\libtsduck\tstspControlCommandLine.h" />
     <ClInclude Include="..\..\src\libtsduck\tsTSScanner.h" />
     <ClInclude Include="..\..\src\libtsduck\tsTSScrambling.h" />
     <ClInclude Include="..\..\src\libtsduck\tsTSSpeedMetrics.h" />
@@ -502,6 +515,7 @@
     <ClInclude Include="..\..\src\libtsduck\tsUDPReceiver.h" />
     <ClInclude Include="..\..\src\libtsduck\tsUDPSocket.h" />
     <ClInclude Include="..\..\src\libtsduck\tsUID.h" />
+    <ClInclude Include="..\..\src\libtsduck\tsURILinkageDescriptor.h" />
     <ClInclude Include="..\..\src\libtsduck\tsUserInterrupt.h" />
     <ClInclude Include="..\..\src\libtsduck\tsUString.h" />
     <ClInclude Include="..\..\src\libtsduck\tsUStringTemplate.h" />
@@ -621,6 +635,8 @@
     <ClCompile Include="..\..\src\libtsduck\tsBlockCipherAlertInterface.cpp" />
     <ClCompile Include="..\..\src\libtsduck\tsBouquetNameDescriptor.cpp" />
     <ClCompile Include="..\..\src\libtsduck\tsByteBlock.cpp" />
+    <ClCompile Include="..\..\src\libtsduck\tsC2BundleDeliverySystemDescriptor.cpp" />
+    <ClCompile Include="..\..\src\libtsduck\tsC2DeliverySystemDescriptor.cpp" />
     <ClCompile Include="..\..\src\libtsduck\tsCableDeliverySystemDescriptor.cpp" />
     <ClCompile Include="..\..\src\libtsduck\tsCableEmergencyAlertTable.cpp" />
     <ClCompile Include="..\..\src\libtsduck\tsCADescriptor.cpp" />
@@ -631,6 +647,8 @@
     <ClCompile Include="..\..\src\libtsduck\tsCASMapper.cpp" />
     <ClCompile Include="..\..\src\libtsduck\tsCASSelectionArgs.cpp" />
     <ClCompile Include="..\..\src\libtsduck\tsCAT.cpp" />
+    <ClCompile Include="..\..\src\libtsduck\tsCellFrequencyLinkDescriptor.cpp" />
+    <ClCompile Include="..\..\src\libtsduck\tsCellListDescriptor.cpp" />
     <ClCompile Include="..\..\src\libtsduck\tsCerrReport.cpp" />
     <ClCompile Include="..\..\src\libtsduck\tsChannelFile.cpp" />
     <ClCompile Include="..\..\src\libtsduck\tsCIAncillaryDataDescriptor.cpp" />
@@ -675,6 +693,7 @@
     <ClCompile Include="..\..\src\libtsduck\tsDoubleCheckLock.cpp" />
     <ClCompile Include="..\..\src\libtsduck\tsDSMCCStreamDescriptorsTable.cpp" />
     <ClCompile Include="..\..\src\libtsduck\tsDTSDescriptor.cpp" />
+    <ClCompile Include="..\..\src\libtsduck\tsDTSHDDescriptor.cpp" />
     <ClCompile Include="..\..\src\libtsduck\tsDTSNeuralDescriptor.cpp" />
     <ClCompile Include="..\..\src\libtsduck\tsDuckConfigFile.cpp" />
     <ClCompile Include="..\..\src\libtsduck\tsDuckContext.cpp" />
@@ -727,6 +746,7 @@
     <ClCompile Include="..\..\src\libtsduck\tsFileOutputPlugin.cpp" />
     <ClCompile Include="..\..\src\libtsduck\tsFilePacketPlugin.cpp" />
     <ClCompile Include="..\..\src\libtsduck\tsForkPipe.cpp" />
+    <ClCompile Include="..\..\src\libtsduck\tsFrequencyListDescriptor.cpp" />
     <ClCompile Include="..\..\src\libtsduck\tsGenreDescriptor.cpp" />
     <ClCompile Include="..\..\src\libtsduck\tsGitHubRelease.cpp" />
     <ClCompile Include="..\..\src\libtsduck\tsGraphicsConstraintsDescriptor.cpp" />
@@ -804,6 +824,7 @@
     <ClCompile Include="..\..\src\libtsduck\tsMutex.cpp" />
     <ClCompile Include="..\..\src\libtsduck\tsMutexInterface.cpp" />
     <ClCompile Include="..\..\src\libtsduck\tsNames.cpp" />
+    <ClCompile Include="..\..\src\libtsduck\tsNetworkChangeNotifyDescriptor.cpp" />
     <ClCompile Include="..\..\src\libtsduck\tsNetworkNameDescriptor.cpp" />
     <ClCompile Include="..\..\src\libtsduck\tsNIT.cpp" />
     <ClCompile Include="..\..\src\libtsduck\tsNorDigLogicalChannelDescriptorV1.cpp" />
@@ -860,6 +881,7 @@
     <ClCompile Include="..\..\src\libtsduck\tsRRT.cpp" />
     <ClCompile Include="..\..\src\libtsduck\tsRST.cpp" />
     <ClCompile Include="..\..\src\libtsduck\tsS2SatelliteDeliverySystemDescriptor.cpp" />
+    <ClCompile Include="..\..\src\libtsduck\tsS2XSatelliteDeliverySystemDescriptor.cpp" />
     <ClCompile Include="..\..\src\libtsduck\tsSatelliteDeliverySystemDescriptor.cpp" />
     <ClCompile Include="..\..\src\libtsduck\tsScramblingDescriptor.cpp" />
     <ClCompile Include="..\..\src\libtsduck\tsSCTE35.cpp" />
@@ -884,6 +906,7 @@
     <ClCompile Include="..\..\src\libtsduck\tsSHA256.cpp" />
     <ClCompile Include="..\..\src\libtsduck\tsSHA512.cpp" />
     <ClCompile Include="..\..\src\libtsduck\tsSharedLibrary.cpp" />
+    <ClCompile Include="..\..\src\libtsduck\tsSHDeliverySystemDescriptor.cpp" />
     <ClCompile Include="..\..\src\libtsduck\tsShortEventDescriptor.cpp" />
     <ClCompile Include="..\..\src\libtsduck\tsSimpleApplicationBoundaryDescriptor.cpp" />
     <ClCompile Include="..\..\src\libtsduck\tsSimpleApplicationLocationDescriptor.cpp" />
@@ -919,6 +942,7 @@
     <ClCompile Include="..\..\src\libtsduck\tsSystemMonitor.cpp" />
     <ClCompile Include="..\..\src\libtsduck\tsSystemRandomGenerator.cpp" />
     <ClCompile Include="..\..\src\libtsduck\tsSysUtils.cpp" />
+    <ClCompile Include="..\..\src\libtsduck\tsT2DeliverySystemDescriptor.cpp" />
     <ClCompile Include="..\..\src\libtsduck\tsT2MIDemux.cpp" />
     <ClCompile Include="..\..\src\libtsduck\tsT2MIDescriptor.cpp" />
     <ClCompile Include="..\..\src\libtsduck\tsT2MIHandlerInterface.cpp" />
@@ -981,9 +1005,11 @@
     <ClCompile Include="..\..\src\libtsduck\tsTSFile.cpp" />
     <ClCompile Include="..\..\src\libtsduck\tsTSFileInputBuffered.cpp" />
     <ClCompile Include="..\..\src\libtsduck\tsTSFileOutputResync.cpp" />
+    <ClCompile Include="..\..\src\libtsduck\tstsp.cpp" />
     <ClCompile Include="..\..\src\libtsduck\tsTSPacket.cpp" />
     <ClCompile Include="..\..\src\libtsduck\tsTSPacketMetadata.cpp" />
     <ClCompile Include="..\..\src\libtsduck\tsTSPacketQueue.cpp" />
+    <ClCompile Include="..\..\src\libtsduck\tstspControlCommandLine.cpp" />
     <ClCompile Include="..\..\src\libtsduck\tsTSScanner.cpp" />
     <ClCompile Include="..\..\src\libtsduck\tsTSScrambling.cpp" />
     <ClCompile Include="..\..\src\libtsduck\tsTSSpeedMetrics.cpp" />
@@ -994,6 +1020,7 @@
     <ClCompile Include="..\..\src\libtsduck\tsUDPReceiver.cpp" />
     <ClCompile Include="..\..\src\libtsduck\tsUDPSocket.cpp" />
     <ClCompile Include="..\..\src\libtsduck\tsUID.cpp" />
+    <ClCompile Include="..\..\src\libtsduck\tsURILinkageDescriptor.cpp" />
     <ClCompile Include="..\..\src\libtsduck\tsUserInterrupt.cpp" />
     <ClCompile Include="..\..\src\libtsduck\tsUString.cpp" />
     <ClCompile Include="..\..\src\libtsduck\tsVBIDataDescriptor.cpp" />

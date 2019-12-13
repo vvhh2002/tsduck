@@ -1546,6 +1546,16 @@ Bits = 8
 0x0C = TS containing INT BAT or NIT
 0x0D = event linkage
 
+[URILinkageType]
+# In URI_linkage_descriptor
+Bits = 8
+0x00 = Online SDT (OSDT) for CI Plus
+0x01 = DVB-IPTV SD&S
+0x02 = Material Resolution Server (MRS) for companion screen applications
+0x03-0x5F = Reserved for registration to DVB specifications
+0x60-0x7F = Reserved for registration to standardised systems through the DVB Project Office
+0x80-0xFF =  user defined
+
 [TeletextType]
 # In teletext_descriptor
 Bits = 8
@@ -1813,6 +1823,88 @@ Bits = 8
 1 = matrixed
 2 = discrete
 3 = undefined
+
+[DTSHDSamplingFrequency]
+# In substream_info() of DTS-HD_descriptor()
+Bits = 4
+0 = 8 kHz
+1 = 16 kHz
+2 = 32 kHz
+3 = 64 kHz
+4 = 128 kHz
+5 = 22.05 kHz
+6 = 44.1 kHz
+7 = 88.2 kHz
+8 = 176.4 kHz
+9 = 352.8 kHz
+10 = 12 kHz
+11 = 24 kHz
+12 = 48 kHz
+13 = 96 kHz
+14 = 192 kHz
+15 = 348 kHz
+
+[DTSHDAssetConstruction]
+# In asset_info() of DTS-HD_descriptor()
+# MSB=0 for substream, MSB=1 for extensions substreams
+Bits = 5
+0x0001 = Core
+0x0002 = Core, XCH
+0x0003 = Core, XXCH
+0x0004 = Core, X96
+0x0005 = Core
+0x0006 = Core
+0x0007 = Core, XCH
+0x0008 = Core, XXCH
+0x0009 = Core
+0x000A = Core
+0x000B = Core, XCH
+0x000C = Core, XXCH
+0x000D = Core
+0x000E = Core
+0x000F = Core, XCH
+0x0010 = Core, X96
+0x0105 = XXCH
+0x0106 = XBR
+0x0107 = XBR
+0x0108 = XBR
+0x0109 = XXCH, XBR
+0x010A = X96
+0x010B = X96
+0x010C = X96
+0x010D = XXCH, X96
+0x010E = XLL
+0x010F = XLL
+0x0110 = XLL
+0x0111 = XLL
+0x0112 = LBR
+0x0113 = Core
+0x0114 = Core, XXCH
+0x0115 = Core, XLL
+
+[DTSHDServiceType]
+# In asset_info() of DTS-HD_descriptor()
+Bits = 3
+0 = Complete Main
+1 = Music and Effects
+2 = Visually Impaired
+3 = Hearing Impaired
+4 = Dialogue
+5 = Commentary
+6 = Emergency
+7 = Voiceover
+
+[DTSHDNumberOfChannels]
+# In asset_info() of DTS-HD_descriptor()
+Bits = 3
+0 = Mono
+1 = Reserved
+2 = 2 channel (stereo, LoRo)
+3 = 2 channel matrix encoded (stereo, LtRt)
+4 = Multichannel audio (> 2 channels)
+5 = Reserved
+6 = Reserved
+7 = Reserved
 
 [AC4ChannelMode]
 Bits = 8
@@ -3326,3 +3418,70 @@ Bits = 8
 0x21 = Viewer-Direct-Select Button B
 0x22 = Viewer-Direct-Select Button C
 0x23 = Viewer-Direct-Select Button D
+
+[C2TuningType]
+# In DVB C2_delivery_system_descriptor.
+Bits = 2
+0 = Data Slice tuning frequency
+1 = C2 system centre frequency
+2 = Initial tuning position for a dependent static data slice
+
+[C2SymbolDuration]
+# In DVB C2_delivery_system_descriptor.
+Bits = 3
+0 = 448 μs (4k FFT mode for 8MHz CATV systems)
+1 = 597,33 μs (4k FFT mode for 6MHz CATV systems)
+
+[SHConstellationHierarchy]
+# In DVB SH_delivery_system_descriptor.
+Bits = 3
+0 = QPSK
+1 = 16-QAM non hierarchical
+2 = 16-QAM hierarchical alpha = 1
+3 = 16-QAM hierarchical alpha = 2
+4 = 16-QAM hierarchical alpha = 3
+
+[SHCodeRate]
+# In DVB SH_delivery_system_descriptor.
+Bits = 4
+0 = 1/5 standard
+1 = 2/9 standard
+2 = 1/4 standard
+3 = 2/7 standard
+4 = 1/3 standard
+5 = 1/3 complementary
+6 = 2/5 standard
+7 = 2/5 complementary
+8 = 1/2 standard
+9 = 1/2 complementary
+10 = 2/3 standard
+11 = 2/3 complementary
+
+[S2XMode]
+# In DVB S2X_satellite_delivery_system_descriptor.
+Bits = 2
+1 = S2X
+2 = S2X + time slicing
+3 = S2X + channel bonding
+
+[TSGSS2XMode]
+# In DVB S2X_satellite_delivery_system_descriptor.
+Bits = 2
+0 = generic packetized
+1 = GSE
+2 = GSE high efficiency mode
+3 = Transport Stream
+
+[NetworkChangeType]
+# In network_change_notify_descriptor
+Bits = 4
+0x0 = Message only
+0x1 = Minor - default
+0x2 = Minor - multiplex removed
+0x3 = Minor - service changed
+0x4-0x7 = reserved for future use for other minor changes
+0x8 = Major - default
+0x9 = Major - multiplex frequency changed
+0xA = Major - multiplex coverage changed
+0xB = Major - multiplex added
+0xC-0xF = reserved for future use for other major changes

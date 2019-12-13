@@ -40,8 +40,9 @@ const size_t ts::Args::UNLIMITED_COUNT = std::numeric_limits<size_t>::max();
 // Unlimited value.
 const int64_t ts::Args::UNLIMITED_VALUE = std::numeric_limits<int64_t>::max();
 
-// List of characters which are allowed thousands separators in integer values
-const ts::UChar* const ts::Args::THOUSANDS_SEPARATORS = u",. ";
+// List of characters which are allowed thousands separators and decimal points in integer values
+const ts::UChar* const ts::Args::THOUSANDS_SEPARATORS = u", ";
+const ts::UChar* const ts::Args::DECIMAL_POINTS = u".";
 
 // Enumeration description of HelpFormat.
 const ts::Enumeration ts::Args::HelpFormatEnum({
@@ -76,6 +77,7 @@ ts::Args::IOption::IOption(const UChar* name_,
                            size_t       max_occur_,
                            int64_t      min_value_,
                            int64_t      max_value_,
+                           size_t       decimals_,
                            uint32_t     flags_) :
 
     name(name_ == nullptr ? UString() : name_),
@@ -85,6 +87,7 @@ ts::Args::IOption::IOption(const UChar* name_,
     max_occur(max_occur_),
     min_value(min_value_),
     max_value(max_value_),
+    decimals(decimals_),
     flags(flags_),
     enumeration(),
     syntax(),
@@ -181,6 +184,7 @@ ts::Args::IOption::IOption(const UChar*       name_,
     max_occur(max_occur_),
     min_value(std::numeric_limits<int>::min()),
     max_value(std::numeric_limits<int>::max()),
+    decimals(0),
     flags(flags_),
     enumeration(enumeration_),
     syntax(),
@@ -246,6 +250,69 @@ ts::UString ts::Args::IOption::valueDescription(ValueContext ctx) const
 
 
 //----------------------------------------------------------------------------
+// When the option has an Enumeration type, get a list of all valid names.
+//----------------------------------------------------------------------------
+
+ts::UString ts::Args::IOption::optionNames(const UString& separator) const
+{
+    return enumeration.nameList(separator, u"\"", u"\"");
+}
+
+
+//----------------------------------------------------------------------------
+// Complete option help text.
+//----------------------------------------------------------------------------
+
+ts::UString ts::Args::IOption::helpText(size_t line_width) const
+{
+    IndentationContext indent_desc = TITLE;
+    UString text;
+
+    // Add option / parameter name.
+    if (name.empty()) {
+        // This is the parameters (ie. not options).
+        indent_desc = PARAMETER_DESC;
+        // Print nothing if parameters are undocumented.
+        if (help.empty() && syntax.empty()) {
+            return UString();
+        }
+        // Print generic title instead of option names.
+        text += HelpLines(TITLE, max_occur <= 1 ? u"Parameter:" : u"Parameters:", line_width);
+        text += LINE_FEED;
+    }
+    else {
+        // This is an option.
+        indent_desc = OPTION_DESC;
+        if (short_name != 0) {
+            text += HelpLines(OPTION_NAME, UString::Format(u"-%c%s", {short_name, valueDescription(IOption::SHORT)}), line_width);
+        }
+        text += HelpLines(OPTION_NAME, UString::Format(u"--%s%s", {name, valueDescription(IOption::LONG)}), line_width);
+    }
+
+    // Add option description.
+    if (!help.empty()) {
+        text += HelpLines(indent_desc, help, line_width);
+    }
+    else if (name.empty() && !syntax.empty()) {
+        // For parameters (no option name previously displayed), use syntax as fallback for help.
+        text += HelpLines(indent_desc, syntax, line_width);
+    }
+
+    // Document all possible values for enumeration types.
+    if (!enumeration.empty() && (flags & (IOPT_OPTVALUE | IOPT_OPTVAL_NOHELP)) != (IOPT_OPTVALUE | IOPT_OPTVAL_NOHELP)) {
+        text += HelpLines(indent_desc, u"Must be one of " + optionNames(u", ") + u".", line_width);
+    }
+
+    // Document decimal values (with a decimal point).
+    if (decimals > 0) {
+        text += HelpLines(indent_desc, UString::Format(u"The value may include up to %d meaningful decimal digits.", {decimals}), line_width);
+    }
+
+    return text;
+}
+
+
+//----------------------------------------------------------------------------
 // Constructor for Args
 //----------------------------------------------------------------------------
 
@@ -256,28 +323,13 @@ ts::Args::Args(const UString& description, const UString& syntax, int flags) :
     _shell(),
     _syntax(syntax),
     _intro(),
+    _tail(),
     _app_name(),
     _args(),
     _is_valid(false),
     _flags(flags)
 {
-    // Add predefined options. The short one-letter names may be overwritten later.
-    if ((flags & NO_HELP) == 0) {
-        addOption(IOption(u"help", 0, HelpFormatEnum, 0, 1, IOPT_PREDEFINED | IOPT_OPTVALUE | IOPT_OPTVAL_NOHELP));
-        help(u"help", u"Display this help text.");
-    }
-    if ((flags & NO_VERSION) == 0) {
-        addOption(IOption(u"version", 0,  VersionFormatEnum, 0, 1, IOPT_PREDEFINED | IOPT_OPTVALUE | IOPT_OPTVAL_NOHELP));
-        help(u"version", u"Display the TSDuck version number.");
-    }
-    if ((flags & NO_VERBOSE) == 0) {
-        addOption(IOption(u"verbose", 'v', NONE, 0, 1, 0, 0, IOPT_PREDEFINED));
-        help(u"verbose", u"Produce verbose output.");
-    }
-    if ((flags & NO_DEBUG) == 0) {
-        addOption(IOption(u"debug", 'd', POSITIVE, 0, 1, 0, 0, IOPT_PREDEFINED | IOPT_OPTVALUE));
-        help(u"debug", u"level", u"Produce debug traces. The default level is 1. Higher levels produce more messages.");
-    }
+    adjustPredefinedOptions();
 }
 
 
@@ -300,9 +352,59 @@ void ts::Args::setIntro(const UString& intro)
     _intro = intro;
 }
 
+void ts::Args::setTail(const UString& tail)
+{
+    _tail = tail;
+}
+
 void ts::Args::setFlags(int flags)
 {
     _flags = flags;
+    adjustPredefinedOptions();
+}
+
+
+//----------------------------------------------------------------------------
+// Adjust predefined options based on flags.
+//----------------------------------------------------------------------------
+
+void ts::Args::adjustPredefinedOptions()
+{
+    // Option --help[=value].
+    if ((_flags & NO_HELP) != 0) {
+        _iopts.erase(u"help");
+    }
+    else if (_iopts.find(u"help") == _iopts.end()) {
+        addOption(IOption(u"help", 0, HelpFormatEnum, 0, 1, IOPT_PREDEFINED | IOPT_OPTVALUE | IOPT_OPTVAL_NOHELP));
+        help(u"help", u"Display this help text.");
+    }
+
+    // Option --version[=value].
+    if ((_flags & NO_VERSION) != 0) {
+        _iopts.erase(u"version");
+    }
+    else if (_iopts.find(u"version") == _iopts.end()) {
+        addOption(IOption(u"version", 0,  VersionFormatEnum, 0, 1, IOPT_PREDEFINED | IOPT_OPTVALUE | IOPT_OPTVAL_NOHELP));
+        help(u"version", u"Display the TSDuck version number.");
+    }
+
+    // Option --verbose.
+    if ((_flags & NO_VERBOSE) != 0) {
+        _iopts.erase(u"verbose");
+    }
+    else if (_iopts.find(u"verbose") == _iopts.end()) {
+        addOption(IOption(u"verbose", 'v', NONE, 0, 1, 0, 0, 0, IOPT_PREDEFINED));
+        help(u"verbose", u"Produce verbose output.");
+    }
+
+    // Option --debug[=value].
+    if ((_flags & NO_DEBUG) != 0) {
+        _iopts.erase(u"debug");
+    }
+    else if (_iopts.find(u"debug") == _iopts.end()) {
+        addOption(IOption(u"debug", 'd', POSITIVE, 0, 1, 0, 0, 0, IOPT_PREDEFINED | IOPT_OPTVALUE));
+        help(u"debug", u"level", u"Produce debug traces. The default level is 1. Higher levels produce more messages.");
+    }
 }
 
 
@@ -310,14 +412,14 @@ void ts::Args::setFlags(int flags)
 // Format help lines from a long text.
 //----------------------------------------------------------------------------
 
-ts::UString ts::Args::HelpLines(int level, const UString& text, size_t line_width)
+ts::UString ts::Args::HelpLines(IndentationContext level, const UString& text, size_t line_width)
 {
     // Actual indentation width.
     size_t indent = 0;
-    if (level == 1) {
+    if (level == PARAMETER_DESC || level == OPTION_NAME) {
         indent = 2;
     }
-    else if (level >= 2) {
+    else if (level == OPTION_DESC) {
         indent = 6;
     }
 
@@ -337,50 +439,29 @@ ts::UString ts::Args::formatHelpOptions(size_t line_width) const
 
     // Set introduction text.
     if (!_intro.empty()) {
-        text = HelpLines(0, _intro, line_width);
+        text = HelpLines(TITLE, _intro, line_width);
     }
 
     // Build a descriptive string from individual options.
     bool titleDone = false;
     for (auto it = _iopts.begin(); it != _iopts.end(); ++it) {
         const IOption& opt(it->second);
-        if (opt.name.empty()) {
-            // This is the parameters (ie. not options).
-            // Print nothing if parameters are undocumented.
-            if (!opt.help.empty() || !opt.syntax.empty()) {
-                if (!text.empty()) {
-                    text += LINE_FEED;
-                }
-                UString title(u"Parameter");
-                if (opt.max_occur > 1) {
-                    title += u's';
-                }
-                text += HelpLines(0, title + u':', line_width);
-                text += LINE_FEED;
-                text += HelpLines(1, opt.help.empty() ? opt.syntax : opt.help, line_width);
-            }
-        }
-        else {
-            // This is an option. Add 'Options:' the first time.
-            if (!titleDone) {
-                titleDone = true;
-                if (!text.empty()) {
-                    text += LINE_FEED;
-                }
-                text += HelpLines(0, u"Options:", line_width);
-            }
+        if (!text.empty()) {
             text += LINE_FEED;
-            if (opt.short_name != 0) {
-                text += HelpLines(1, UString::Format(u"-%c%s", {opt.short_name, opt.valueDescription(IOption::SHORT)}), line_width);
-            }
-            text += HelpLines(1, UString::Format(u"--%s%s", {opt.name, opt.valueDescription(IOption::LONG)}), line_width);
-            if (!opt.help.empty()) {
-                text += HelpLines(2, opt.help, line_width);
-            }
-            if (!opt.enumeration.empty() && (opt.flags & (IOPT_OPTVALUE | IOPT_OPTVAL_NOHELP)) != (IOPT_OPTVALUE | IOPT_OPTVAL_NOHELP)) {
-                text += HelpLines(2, u"Must be one of " + optionNames(opt.name.c_str()) + u".", line_width);
-            }
         }
+        // When this is an option, add 'Options:' the first time.
+        if (!titleDone && !opt.name.empty()) {
+            titleDone = true;
+            text += HelpLines(TITLE, u"Options:", line_width);
+            text += LINE_FEED;
+        }
+        text += opt.helpText(line_width);
+    }
+
+    // Set final text.
+    if (!_tail.empty()) {
+        text += LINE_FEED;
+        text.append(HelpLines(TITLE, _tail, line_width));
     }
     return text;
 }
@@ -421,9 +502,10 @@ ts::Args& ts::Args::option(const UChar* name,
                            size_t       max_occur,
                            int64_t      min_value,
                            int64_t      max_value,
-                           bool         optional)
+                           bool         optional,
+                           size_t       decimals)
 {
-    addOption(IOption(name, short_name, type, min_occur, max_occur, min_value, max_value, optional ? uint32_t(IOPT_OPTVALUE) : 0));
+    addOption(IOption(name, short_name, type, min_occur, max_occur, min_value, max_value, decimals, optional ? uint32_t(IOPT_OPTVALUE) : 0));
     return *this;
 }
 
@@ -464,7 +546,7 @@ ts::Args& ts::Args::help(const UChar* name, const UString& syntax, const UString
 ts::UString ts::Args::optionNames(const ts::UChar* name, const ts::UString& separator) const
 {
     const IOption& opt(getIOption(name));
-    return opt.enumeration.nameList(separator, u"\"", u"\"");
+    return opt.optionNames(separator);
 }
 
 
@@ -488,12 +570,14 @@ ts::Args& ts::Args::copyOptions(const Args& other, const bool replace)
 // Redirect report logging. Redirection cancelled if zero.
 //----------------------------------------------------------------------------
 
-void ts::Args::redirectReport(Report* rep)
+ts::Report* ts::Args::redirectReport(Report* rep)
 {
+    Report* previous = _subreport;
     _subreport = rep;
     if (rep != nullptr && rep->maxSeverity() > this->maxSeverity()) {
         this->setMaxSeverity(rep->maxSeverity());
     }
+    return previous;
 }
 
 
@@ -736,26 +820,45 @@ ts::Tristate ts::Args::tristateValue(const UChar* name, size_t index) const
 
 
 //----------------------------------------------------------------------------
-// Load arguments and analyze them.
+// Get the full command line from the last command line analysis.
 //----------------------------------------------------------------------------
 
-bool ts::Args::analyze(const UString& app_name, const UStringVector& arguments, bool processRedirections)
+ts::UString ts::Args::commandLine() const
 {
-    _app_name = app_name;
-    _args = arguments;
-    return analyze(processRedirections);
+    UString line(_app_name.toQuoted());
+    if (!_args.empty()) {
+        line.append(SPACE);
+        line.append(UString::ToQuotedLine(_args));
+    }
+    return line;
+}
+
+
+//----------------------------------------------------------------------------
+// Load arguments and analyze them, overloads.
+//----------------------------------------------------------------------------
+
+bool ts::Args::analyze(const UString& command, bool processRedirections)
+{
+    UString app;
+    UStringVector args;
+    command.fromQuotedLine(args);
+    if (!args.empty()) {
+        app = args.front();
+        args.erase(args.begin());
+    }
+    return analyze(app, args, processRedirections);
 }
 
 bool ts::Args::analyze(int argc, char* argv[], bool processRedirections)
 {
-    _app_name = argc > 0 ? BaseName(UString::FromUTF8(argv[0]), TS_EXECUTABLE_SUFFIX) : UString();
-    if (argc < 2) {
-        _args.clear();
+    UString app;
+    UStringVector args;
+    if (argc > 0) {
+        app = BaseName(UString::FromUTF8(argv[0]), TS_EXECUTABLE_SUFFIX);
+        UString::Assign(args, argc - 1, argv + 1);
     }
-    else {
-        UString::Assign(_args, argc - 1, argv + 1);
-    }
-    return analyze(processRedirections);
+    return analyze(app, args, processRedirections);
 }
 
 
@@ -763,8 +866,12 @@ bool ts::Args::analyze(int argc, char* argv[], bool processRedirections)
 // Common code: analyze the command line.
 //----------------------------------------------------------------------------
 
-bool ts::Args::analyze(bool processRedirections)
+bool ts::Args::analyze(const UString& app_name, const UStringVector& arguments, bool processRedirections)
 {
+    // Save command line and arguments.
+    _app_name = app_name;
+    _args = arguments;
+
     // Clear previous values
     for (IOptionMap::iterator it = _iopts.begin(); it != _iopts.end(); ++it) {
         it->second.values.clear();
@@ -921,6 +1028,7 @@ bool ts::Args::analyze(bool processRedirections)
 bool ts::Args::validateParameter(IOption& opt, const Variable<UString>& val)
 {
     int64_t last = 0;
+    size_t point = NPOS;
 
     // Build the argument value.
     ArgValue arg;
@@ -971,11 +1079,15 @@ bool ts::Args::validateParameter(IOption& opt, const Variable<UString>& val)
         arg.int_base = i;
         arg.int_count = 1;
     }
-    else if (val.value().toInteger(arg.int_base, THOUSANDS_SEPARATORS)) {
+    else if (val.value().toInteger(arg.int_base, THOUSANDS_SEPARATORS, opt.decimals, DECIMAL_POINTS)) {
         // Found exactly one integer value.
         arg.int_count = 1;
     }
-    else if (val.value().scan(u"%'d-%'d", {&arg.int_base, &last})) {
+    else if ((point = val.value().find(u'-')) != NPOS &&
+             point + 1 < val.value().size() &&
+             val.value().substr(0, point).toInteger(arg.int_base, THOUSANDS_SEPARATORS, opt.decimals, DECIMAL_POINTS) &&
+             val.value().substr(point + 1).toInteger(last, THOUSANDS_SEPARATORS, opt.decimals, DECIMAL_POINTS))
+    {
         // Found one range of integer values.
         if (last < arg.int_base) {
             error(u"invalid range of integer values \"%s\" for %s", {val.value(), opt.display()});

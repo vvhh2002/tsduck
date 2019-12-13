@@ -26,10 +26,6 @@
 // THE POSSIBILITY OF SUCH DAMAGE.
 //
 //----------------------------------------------------------------------------
-//
-//  Transport stream processor command-line options
-//
-//----------------------------------------------------------------------------
 
 #include "tspOptions.h"
 #include "tsAsyncReport.h"
@@ -43,6 +39,7 @@ TSDUCK_SOURCE;
 #define DEF_MAX_FLUSH_PKT_RT            1000  // packets
 #define DEF_MAX_INPUT_PKT_OFL              0  // packets
 #define DEF_MAX_INPUT_PKT_RT            1000  // packets
+#define DEF_CONTROL_TIMEOUT             5000  // milliseconds
 
 // Options for --list-processor.
 const ts::Enumeration ts::tsp::Options::ListProcessorEnum({
@@ -76,7 +73,12 @@ ts::tsp::Options::Options(int argc, char *argv[]) :
     bitrate_adj(0),
     init_bitrate_adj(DEF_INIT_BITRATE_PKT_INTERVAL),
     realtime(Tristate::MAYBE),
-    receive_timeout(0)
+    receive_timeout(0),
+    control_port(0),
+    control_local(),
+    control_reuse(false),
+    control_sources(),
+    control_timeout(DEF_CONTROL_TIMEOUT)
 {
     setDescription(u"MPEG transport stream processor using a chain of plugins");
 
@@ -119,11 +121,39 @@ ts::tsp::Options::Options(int argc, char *argv[]) :
          u"or modulator devices use it, while file devices ignore it. "
          u"This option is ignored if --bitrate is specified. ");
 
-    option(u"buffer-size-mb", 0, POSITIVE);
+    option(u"buffer-size-mb", 0, POSITIVE, 0, 1, 0, 0, false, 6);
     help(u"buffer-size-mb",
          u"Specify the buffer size in mega-bytes. This is the size of "
          u"the buffer between the input and output devices. The default "
          u"is " TS_USTRINGIFY(DEF_BUFSIZE_MB) u" MB.");
+
+    option(u"control-port", 0, UINT16);
+    help(u"control-port",
+         u"Specify the TCP port on which tsp listens for control commands. "
+         u"If unspecified, no control commands are expected.");
+
+    option(u"control-local", 0, STRING);
+    help(u"control-local", u"address",
+         u"Specify the IP address of the local interface on which to listen for control commands. "
+         u"It can be also a host name that translates to a local address. "
+         u"By default, listen on all local interfaces.");
+
+    option(u"control-reuse-port");
+    help(u"control-reuse-port",
+         u"Set the 'reuse port' socket option on the control TCP server port. "
+         u"This option is not enabled by default to avoid accidentally running "
+         u"two tsp commands with the same control port.");
+
+    option(u"control-source", 0, STRING);
+    help(u"control-source", u"address",
+         u"Specify a remote IP address which is allowed to send control commands. "
+         u"By default, as a security precaution, only the local host is allowed to connect. "
+         u"Several --control-source options are allowed.");
+
+    option(u"control-timeout", 0, UNSIGNED);
+    help(u"control-timeout", u"milliseconds",
+         u"Specify the reception timeout in milliseconds for control commands. "
+         u"The default timeout is " TS_STRINGIFY(DEF_CONTROL_TIMEOUT) u" ms.");
 
     option(u"ignore-joint-termination", 'i');
     help(u"ignore-joint-termination",
@@ -208,7 +238,7 @@ ts::tsp::Options::Options(int argc, char *argv[]) :
     list_proc_flags = present(u"list-processors") ? intValue<int>(u"list-processors", PluginRepository::LIST_ALL) : 0;
     monitor = present(u"monitor");
     sync_log = present(u"synchronous-log");
-    bufsize = 1024 * 1024 * intValue<size_t>(u"buffer-size-mb", DEF_BUFSIZE_MB);
+    bufsize = intValue<size_t>(u"buffer-size-mb", DEF_BUFSIZE_MB * 1000000);
     bitrate = intValue<BitRate>(u"bitrate", 0);
     bitrate_adj = MilliSecPerSec * intValue(u"bitrate-adjust-interval", DEF_BITRATE_INTERVAL);
     max_flush_pkt = intValue<size_t>(u"max-flushed-packets", 0);
@@ -219,7 +249,37 @@ ts::tsp::Options::Options(int argc, char *argv[]) :
     ignore_jt = present(u"ignore-joint-termination");
     realtime = tristateValue(u"realtime");
     receive_timeout = intValue<MilliSecond>(u"receive-timeout", 0);
+    control_port = intValue<uint16_t>(u"control-port", 0);
+    control_timeout = intValue<MilliSecond>(u"control-timeout", DEF_CONTROL_TIMEOUT);
+    control_reuse = present(u"control-reuse-port");
 
+    // Convert MB in MiB for buffer size for compatibility with original versions.
+    bufsize = size_t((uint64_t(bufsize) * 1024 * 1024) / 1000000);
+
+    // Get and resolve optional local address.
+    if (!present(u"control-local")) {
+        control_local.clear();
+    }
+    else {
+        control_local.resolve(value(u"control-local"), *this);
+    }
+
+    // Get and resolve optional allowed remote addresses.
+    control_sources.clear();
+    if (!present(u"control-source")) {
+        // By default, the local host is the only allowed address.
+        control_sources.push_back(IPAddress::LocalHost);
+    }
+    else {
+        for (size_t i = 0; i < count(u"control-source"); ++i) {
+            IPAddress addr;
+            if (addr.resolve(value(u"control-source", u"", i), *this)) {
+                control_sources.push_back(addr);
+            }
+        }
+    }
+
+    // Decode --add-input-stuffing nullpkt/inpkt.
     if (present(u"add-input-stuffing") && !value(u"add-input-stuffing").scan(u"%d/%d", {&instuff_nullpkt, &instuff_inpkt})) {
         error(u"invalid value for --add-input-stuffing, use \"nullpkt/inpkt\" format");
     }

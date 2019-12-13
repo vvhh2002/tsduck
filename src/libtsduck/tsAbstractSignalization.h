@@ -117,6 +117,32 @@ namespace ts {
         //!
         static const UChar* const XML_GENERIC_LONG_TABLE;
 
+        //!
+        //! This static method serializes a DVB string with a required fixed size.
+        //! @param [in,out] duck TSDuck execution context.
+        //! @param [in,out] bb A byte-block where @a str will be appended if its size is correct.
+        //! @param [in] str String to serialize.
+        //! @param [in] size Required size in bytes of the serialized string.
+        //! @return True if the size has the required length and has been serialized.
+        //!
+        static bool SerializeFixedLength(DuckContext& duck, ByteBlock& bb, const UString& str, const size_t size);
+
+        //!
+        //! This static method serializes a 3-byte language or country code.
+        //! @param [in,out] bb A byte-block where @a str will be appended if its size is correct.
+        //! @param [in] str String to serialize.
+        //! @param [in] allow_empty If true, an empty string is allowed and serialized as zeroes.
+        //! @return True if the size has the required length and has been serialized.
+        //!
+        static bool SerializeLanguageCode(ByteBlock& bb, const UString& str, bool allow_empty = false);
+
+        //!
+        //! This static method deserializes a 3-byte language or country code.
+        //! @param [in] data Address of a 3-byte memory area.
+        //! @return Deserialized string.
+        //!
+        static UString DeserializeLanguageCode(const uint8_t* data);
+
     protected:
         //!
         //! XML table or descriptor name.
@@ -175,30 +201,34 @@ namespace ts {
         bool checkXMLName(const xml::Element* element, const UChar* legacy_name = nullptr) const;
 
         //!
-        //! This static method serializes a DVB string with a required fixed size.
-        //! @param [in,out] duck TSDuck execution context.
-        //! @param [in,out] bb A byte-block where @a str will be appended if its size is correct.
-        //! @param [in] str String to serialize.
-        //! @param [in] size Required size in bytes of the serialized string.
-        //! @return True if the size has the required length and has been serialized.
+        //! Deserialize a 3-byte language or country code.
+        //! @param [out] lang Deserialized language code.
+        //! @param [in,out] data Address of memory area. Adjusted to point after the deserialized data.
+        //! @param [in,out] size Remaining size in bytes of memory area. Adjusted remove the deserialized data.
+        //! @return True on success, false on error. On error, the object is invalidated.
         //!
-        static bool SerializeFixedLength(DuckContext& duck, ByteBlock& bb, const UString& str, const size_t size);
+        bool deserializeLanguageCode(UString& lang, const uint8_t*& data, size_t& size);
 
         //!
-        //! This static method serializes a 3-byte language or country code.
-        //! @param [in,out] bb A byte-block where @a str will be appended if its size is correct.
-        //! @param [in] str String to serialize.
-        //! @param [in] allow_empty If true, an empty string is allowed and serialized as zeroes.
-        //! @return True if the size has the required length and has been serialized.
+        //! Deserialize an integer.
+        //! @tparam INT Some integer type.
+        //! @param [out] value Deserialized integer value.
+        //! @param [in,out] data Address of memory area. Adjusted to point after the deserialized data.
+        //! @param [in,out] size Remaining size in bytes of memory area. Adjusted remove the deserialized data.
+        //! @return True on success, false on error. On error, the object is invalidated.
         //!
-        static bool SerializeLanguageCode(ByteBlock& bb, const UString& str, bool allow_empty = false);
+        template<typename INT, typename std::enable_if<std::is_integral<INT>::value>::type* = nullptr>
+        bool deserializeInt(INT& value, const uint8_t*& data, size_t& size);
 
         //!
-        //! This static method deserializes a 3-byte language or country code.
-        //! @param [in] data Address of a 3-byte memory area.
-        //! @return Deserialized string.
+        //! Deserialize a one-bit boolean inside one byte.
+        //! @param [out] value Deserialized bool value.
+        //! @param [in,out] data Address of memory area. Adjusted to point after the deserialized data (one byte).
+        //! @param [in,out] size Remaining size in bytes of memory area. Adjusted remove the deserialized data.
+        //! @param [in] bit Bit number of the boolean in the deserialized byte, from 0 (LSB) to 7 (MSB).
+        //! @return True on success, false on error. On error, the object is invalidated.
         //!
-        static UString DeserializeLanguageCode(const uint8_t* data);
+        bool deserializeBool(bool& value, const uint8_t*& data, size_t& size, size_t bit = 0);
 
     private:
         const Standards _standards;  // Defining standards (usually only one).
@@ -207,3 +237,5 @@ namespace ts {
         AbstractSignalization() = delete;
     };
 }
+
+#include "tsAbstractSignalizationTemplate.h"

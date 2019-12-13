@@ -46,11 +46,15 @@
     REF_TYPE(AVCTimingAndHRDDescriptor);
     REF_TYPE(AVCVideoDescriptor);
     REF_TYPE(BouquetNameDescriptor);
+    REF_TYPE(C2BundleDeliverySystemDescriptor);
+    REF_TYPE(C2DeliverySystemDescriptor);
     REF_TYPE(CableDeliverySystemDescriptor);
     REF_TYPE(CADescriptor);
     REF_TYPE(CAIdentifierDescriptor);
     REF_TYPE(CaptionServiceDescriptor);
     REF_TYPE(CarouselIdentifierDescriptor);
+    REF_TYPE(CellFrequencyLinkDescriptor);
+    REF_TYPE(CellListDescriptor);
     REF_TYPE(CIAncillaryDataDescriptor);
     REF_TYPE(ComponentDescriptor);
     REF_TYPE(ComponentNameDescriptor);
@@ -69,6 +73,7 @@
     REF_TYPE(DeferredAssociationTagsDescriptor);
     REF_TYPE(DIILocationDescriptor);
     REF_TYPE(DTSDescriptor);
+    REF_TYPE(DTSHDDescriptor);
     REF_TYPE(DTSNeuralDescriptor);
     REF_TYPE(DVBAC3Descriptor);
     REF_TYPE(DVBAC4Descriptor);
@@ -93,6 +98,7 @@
     REF_TYPE(ExtendedEventDescriptor);
     REF_TYPE(ExternalApplicationAuthorizationDescriptor);
     REF_TYPE(ExternalESIdDescriptor);
+    REF_TYPE(FrequencyListDescriptor);
     REF_TYPE(GenreDescriptor);
     REF_TYPE(GraphicsConstraintsDescriptor);
     REF_TYPE(HDSimulcastLogicalChannelDescriptor);
@@ -119,6 +125,7 @@
     REF_TYPE(MultilingualNetworkNameDescriptor);
     REF_TYPE(MultilingualServiceNameDescriptor);
     REF_TYPE(MultiplexBufferUtilizationDescriptor);
+    REF_TYPE(NetworkChangeNotifyDescriptor);
     REF_TYPE(NetworkNameDescriptor);
     REF_TYPE(NorDigLogicalChannelDescriptorV1);
     REF_TYPE(NorDigLogicalChannelDescriptorV2);
@@ -134,6 +141,7 @@
     REF_TYPE(RedistributionControlDescriptor);
     REF_TYPE(RegistrationDescriptor);
     REF_TYPE(S2SatelliteDeliverySystemDescriptor);
+    REF_TYPE(S2XSatelliteDeliverySystemDescriptor);
     REF_TYPE(SatelliteDeliverySystemDescriptor);
     REF_TYPE(ScramblingDescriptor);
     REF_TYPE(ServiceAvailabilityDescriptor);
@@ -143,6 +151,7 @@
     REF_TYPE(ServiceLocationDescriptor);
     REF_TYPE(ServiceMoveDescriptor);
     REF_TYPE(ServiceRelocatedDescriptor);
+    REF_TYPE(SHDeliverySystemDescriptor);
     REF_TYPE(ShortEventDescriptor);
     REF_TYPE(SimpleApplicationBoundaryDescriptor);
     REF_TYPE(SimpleApplicationLocationDescriptor);
@@ -162,6 +171,7 @@
     REF_TYPE(SubtitlingDescriptor);
     REF_TYPE(SupplementaryAudioDescriptor);
     REF_TYPE(SystemClockDescriptor);
+    REF_TYPE(T2DeliverySystemDescriptor);
     REF_TYPE(T2MIDescriptor);
     REF_TYPE(TargetBackgroundGridDescriptor);
     REF_TYPE(TargetIPAddressDescriptor);
@@ -180,6 +190,7 @@
     REF_TYPE(TimeSliceFECIdentifierDescriptor);
     REF_TYPE(TransportProtocolDescriptor);
     REF_TYPE(TransportStreamDescriptor);
+    REF_TYPE(URILinkageDescriptor);
     REF_TYPE(VBIDataDescriptor);
     REF_TYPE(VBITeletextDescriptor);
     REF_TYPE(VideoStreamDescriptor);

@@ -26,10 +26,6 @@
 // THE POSSIBILITY OF SUCH DAMAGE.
 //
 //----------------------------------------------------------------------------
-//
-//  Representation of an S2_satellite_delivery_system_descriptor.
-//
-//----------------------------------------------------------------------------
 
 #include "tsS2SatelliteDeliverySystemDescriptor.h"
 #include "tsDescriptor.h"
@@ -41,7 +37,6 @@ TSDUCK_SOURCE;
 
 #define MY_XML_NAME u"S2_satellite_delivery_system_descriptor"
 #define MY_DID ts::DID_S2_SAT_DELIVERY
-#define MY_STD ts::STD_DVB
 
 TS_XML_DESCRIPTOR_FACTORY(ts::S2SatelliteDeliverySystemDescriptor, MY_XML_NAME);
 TS_ID_DESCRIPTOR_FACTORY(ts::S2SatelliteDeliverySystemDescriptor, ts::EDID::Standard(MY_DID));
@@ -53,7 +48,7 @@ TS_FACTORY_REGISTER(ts::S2SatelliteDeliverySystemDescriptor::DisplayDescriptor, 
 //----------------------------------------------------------------------------
 
 ts::S2SatelliteDeliverySystemDescriptor::S2SatelliteDeliverySystemDescriptor() :
-    AbstractDescriptor(MY_DID, MY_XML_NAME, MY_STD, 0),
+    AbstractDeliverySystemDescriptor(MY_DID, DS_DVB_S2, MY_XML_NAME),
     scrambling_sequence_selector(false),
     multiple_input_stream_flag(false),
     backwards_compatibility_indicator(false),

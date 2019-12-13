@@ -46,7 +46,7 @@ TSDUCK_SOURCE;
 // "uncorrected blocks". But the corresponding ioctl commands (FE_READ_BER, FE_READ_SNR,
 // FE_READ_SIGNAL_STRENGTH, FE_READ_UNCORRECTED_BLOCKS) are marked as deprecated with
 // DVB API v5 and most drivers now return error 524 (ENOTSUPP). So, we simply drop the
-// feature. Also note that there are several forms os "unsupported" in errno and 524
+// feature. Also note that there are several forms of "unsupported" in errno and 524
 // is usually not defined...
 #if !defined(DVB_ENOTSUPP)
     #define DVB_ENOTSUPP 524
@@ -318,16 +318,50 @@ bool ts::Tuner::open(const UString& device_name, bool info_only, Report& report)
     _guts->fe_info.name[sizeof(_guts->fe_info.name) - 1] = 0;
     _device_info = UString::FromUTF8(_guts->fe_info.name);
 
-    // Get the set of delivery systems for this frontend.
+    // Get the set of delivery systems for this frontend. Use DTV_ENUM_DELSYS to list all delivery systems.
+    // If this failed, probably due to an obsolete driver, use the tuner type from FE_GET_INFO. This gives
+    // only one tuner type but this is better than nothing.
 
     _delivery_systems.clear();
     DTVProperties props;
     props.add(DTV_ENUM_DELSYS);
-    if (::ioctl(_guts->frontend_fd, ioctl_request_t(FE_GET_PROPERTY), props.getIoctlParam()) < 0) {
-        report.error(u"error getting delivery systems of %s: %s", {_guts->frontend_name, ErrorCodeMessage()});
-        return close(report) || false;
+    if (::ioctl(_guts->frontend_fd, ioctl_request_t(FE_GET_PROPERTY), props.getIoctlParam()) >= 0) {
+        // DTV_ENUM_DELSYS succeeded, get all delivery systems.
+        props.getValuesByCommand(_delivery_systems, DTV_ENUM_DELSYS);
     }
-    props.getValuesByCommand(_delivery_systems, DTV_ENUM_DELSYS);
+    else {
+        // DTV_ENUM_DELSYS failed, convert tuner type from FE_GET_INFO.
+        const ErrorCode err = LastErrorCode();
+        const bool can2g = (_guts->fe_info.caps & FE_CAN_2G_MODULATION) != 0;
+        switch (_guts->fe_info.type) {
+            case FE_QPSK:
+                _delivery_systems.insert(DS_DVB_S);
+                if (can2g) {
+                    _delivery_systems.insert(DS_DVB_S2);
+                }
+                break;
+            case FE_QAM:
+                _delivery_systems.insert(DS_DVB_C);
+                if (can2g) {
+                    _delivery_systems.insert(DS_DVB_C2);
+                }
+                break;
+            case FE_OFDM:
+                _delivery_systems.insert(DS_DVB_T);
+                if (can2g) {
+                    _delivery_systems.insert(DS_DVB_T2);
+                }
+                break;
+            case FE_ATSC:
+                _delivery_systems.insert(DS_ATSC);
+                break;
+            default:
+                report.error(u"invalid tuner type %d for %s", {_guts->fe_info.type, _guts->frontend_name});
+                close(report);
+                return false;
+        }
+        report.verbose(u"error getting delivery systems of %s (%s), using %s", {_guts->frontend_name, ErrorCodeMessage(err), _delivery_systems.toString()});
+    }
 
     // Open DVB adapter DVR (tap for TS packets) and adapter demux
 
@@ -337,11 +371,13 @@ bool ts::Tuner::open(const UString& device_name, bool info_only, Report& report)
     else {
         if ((_guts->dvr_fd = ::open(_guts->dvr_name.toUTF8().c_str(), O_RDONLY)) < 0) {
             report.error(u"error opening %s: %s", {_guts->dvr_name, ErrorCodeMessage()});
-            return close(report) || false;
+            close(report);
+            return false;
         }
         if ((_guts->demux_fd = ::open(_guts->demux_name.toUTF8().c_str(), O_RDWR)) < 0) {
             report.error(u"error opening %s: %s", {_guts->demux_name, ErrorCodeMessage()});
-            return close(report) || false;
+            close(report);
+            return false;
         }
     }
 

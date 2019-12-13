@@ -50,7 +50,7 @@ namespace ts {
         //! Get the delivery system.
         //! @return The delivery system.
         //!
-        DeliverySystem deliverySystem() const {return _system;}
+        virtual DeliverySystem deliverySystem() const;
 
         //!
         //! Virtual destructor

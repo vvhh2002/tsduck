@@ -455,87 +455,112 @@ bool ts::UString::Load(CONTAINER& container, const UString& fileName)
 //----------------------------------------------------------------------------
 
 template <typename INT, typename std::enable_if<std::is_integral<INT>::value>::type*>
-bool ts::UString::toInteger(INT& value, const UString& thousandSeparators) const
+bool ts::UString::toInteger(INT& value, const UString& thousandSeparators, size_type decimals, const UString& decimalSeparators) const
 {
-    // In this function, we work on formal integer types INT. We use std::numeric_limits<INT> to test the
-    // capabilities of the type (is_signed, etc.) But, for each instantiation of INT, some expression
-    // may not make sense and the Microsoft compiler complains about that. Disable specific warnings.
-    TS_PUSH_WARNING()
-    TS_MSC_NOWARNING(4127)
-    TS_MSC_NOWARNING(4146)
-
-    typedef typename std::numeric_limits<INT> limits;
-
-    // Initial value, up to decode error
-    value = static_cast<INT>(0);
-
-    // Reject non-integer type (floating points, etc.) and invalid parameters
-    if (!limits::is_integer) {
-        return false;
-    }
-
-    // Locate actual begin and end of integer value
+    // Locate actual begin and end of integer value. Skip leading redundant '+' sign.
     const UChar* start = data();
     const UChar* end = start + length();
-    while (start < end && IsSpace(*start)) {
+    while (start < end && (IsSpace(*start) || *start == u'+')) {
         ++start;
     }
     while (start < end && IsSpace(*(end-1))) {
         --end;
     }
 
-    // Skip optional sign
-    bool negative = false;
-    if (start < end) {
-        if (*start == '+') {
-            ++start;
-        }
-        else if (*start == '-') {
-            if (!limits::is_signed) {
-                // INT type is unsigned, invalid signed value
-                return false;
-            }
-            ++start;
-            negative = true;
-        }
-    }
+    // Decode the value. Use unsigned or signed version.
+    return ToIntegerHelper(start, end, value, thousandSeparators, decimals, decimalSeparators);
+}
 
-    // Look for hexadecimal prefix
+
+//----------------------------------------------------------------------------
+// Internal helper for toInteger, unsigned version.
+//----------------------------------------------------------------------------
+
+template<typename INT, typename std::enable_if<std::is_integral<INT>::value && std::is_unsigned<INT>::value>::type*>
+bool ts::UString::ToIntegerHelper(const UChar* start, const UChar* end, INT& value, const UString& thousandSeparators, size_type decimals, const UString& decimalSeparators)
+{
+    // Initial value, up to decode error.
+    value = static_cast<INT>(0);
+
+    // Look for hexadecimal prefix.
     int base = 10;
-    if (start + 1 < end && start[0] == UChar('0') && (start[1] == UChar('x') || start[1] == UChar('X'))) {
+    if (start + 1 < end && start[0] == u'0' && (start[1] == u'x' || start[1] == u'X')) {
         start += 2;
         base = 16;
     }
 
-    // Filter empty string
-    if (start == end) {
+    // Filter empty string.
+    if (start >= end) {
         return false;
     }
-    assert(start < end);
 
-    // Decode the string
+    // Decimal digits handling.
+    bool dec_found = false;   // a decimal point was found
+    size_type dec_count = 0;  // number of decimal digits found
+
+    // Decode the string.
     while (start < end) {
         const int digit = ToDigit(*start, base);
         if (digit >= 0) {
-            // Character is a valid digit
-            value = value * static_cast<INT>(base) + static_cast<INT>(digit);
+            // Character is a valid digit. Ignore extraneous decimal digits.
+            if (!dec_found || dec_count < decimals) {
+                value = value * static_cast<INT>(base) + static_cast<INT>(digit);
+            }
+            // Count decimal digits, after the decimal point.
+            if (dec_found) {
+                ++dec_count;
+            }
         }
-        else if (thousandSeparators.find(*start) == NPOS) {
-            // Character is not a possible thousands separator
-            break;
+        else if (decimalSeparators.contain(*start)) {
+            // Found a decimal point. Only one is allowed.
+            // A decimal point is allowed only in base 10.
+            if (dec_found || base != 10) {
+                return false;
+            }
+            dec_found = true;
+        }
+        else if (!thousandSeparators.contain(*start)) {
+            // Character is not a possible thousands separator to ignore.
+            return false;
         }
         ++start;
     }
 
-    // Apply sign
+    // If decimals are missing, adjust the value.
+    while (dec_count < decimals) {
+        value = 10 * value;
+        ++dec_count;
+    }
+
+    return true;
+}
+
+
+//----------------------------------------------------------------------------
+// Internal helper for toInteger, signed version.
+//----------------------------------------------------------------------------
+
+template<typename INT, typename std::enable_if<std::is_integral<INT>::value && std::is_signed<INT>::value>::type*>
+bool ts::UString::ToIntegerHelper(const UChar* start, const UChar* end, INT& value, const UString& thousandSeparators, size_type decimals, const UString& decimalSeparators)
+{
+    // Skip optional minus sign.
+    bool negative = false;
+    if (start < end && *start == '-') {
+        ++start;
+        negative = true;
+    }
+
+    // Decode the string as an unsigned integer.
+    typename std::make_unsigned<INT>::type uvalue = 0;
+    const bool ok = ToIntegerHelper(start, end, uvalue, thousandSeparators, decimals, decimalSeparators);
+
+    // Convert the unsigned integer as signed integer with the appropriate sign.
+    value = static_cast<INT>(uvalue);
     if (negative) {
         value = -value;
     }
 
-    // Success only if we went down to the end of string
-    return start == end;
-
-    TS_POP_WARNING()
+    return ok;
 }
 
 
@@ -544,7 +569,7 @@ bool ts::UString::toInteger(INT& value, const UString& thousandSeparators) const
 //----------------------------------------------------------------------------
 
 template <class CONTAINER, typename std::enable_if<std::is_integral<typename CONTAINER::value_type>::value>::type*>
-bool ts::UString::toIntegers(CONTAINER& container, const UString& thousandSeparators, const UString& listSeparators) const
+bool ts::UString::toIntegers(CONTAINER& container, const UString& thousandSeparators, const UString& listSeparators, size_type decimals, const UString& decimalSeparators) const
 {
     // Let's name INT the integer type.
     // In all STL standard containers, value_type is a typedef for the element type.
@@ -574,7 +599,7 @@ bool ts::UString::toIntegers(CONTAINER& container, const UString& thousandSepara
         }
         // Decode segment
         INT value = static_cast<INT>(0);
-        if (!substr(start, end - start).toInteger<INT>(value, thousandSeparators)) {
+        if (!substr(start, end - start).toInteger<INT>(value, thousandSeparators, decimals, decimalSeparators)) {
             return false;
         }
         container.push_back(value);
@@ -614,56 +639,9 @@ ts::UString ts::UString::Decimal(INT value,
                                  bool force_sign,
                                  UChar pad)
 {
-    // We build the result string in s IN REVERSE ORDER
+    // We build the result string in s.
     UString s;
-    s.reserve(32); // avoid reallocating (most of the time)
-
-    // So, we need the separator in reverse order too.
-    UString sep(separator);
-    sep.reverse();
-
-    // If the value is negative, format the absolute value.
-    // The test "value != 0 && value < 1" means "value < 0"
-    // but avoid GCC warning when the type is unsigned.
-    const bool negative = value != 0 && value < 1;
-
-    INT ivalue;
-    if (negative) {
-        // If the type is unsigned, "ivalue = -value" will never be executed but Visual C++ complains.
-        TS_PUSH_WARNING()
-        TS_MSC_NOWARNING(4146)
-
-        ivalue = -value;
-
-        TS_POP_WARNING()
-    }
-    else {
-        ivalue = value;
-    }
-
-    // Format the value
-    if (ivalue == 0) {
-        s.push_back(u'0');
-    }
-    else {
-        int count = 0;
-        while (ivalue != 0) {
-            s.push_back(u'0' + UChar(ivalue % 10));
-            ivalue /= 10;
-            if (++count % 3 == 0 && ivalue != 0) {
-                s += sep;
-            }
-        }
-    }
-    if (negative) {
-        s.push_back(u'-');
-    }
-    else if (force_sign) {
-        s.push_back(u'+');
-    }
-
-    // Reverse characters in string
-    s.reverse();
+    DecimalHelper(s, value, separator, force_sign);
 
     // Adjust string width.
     if (s.size() < min_width) {
@@ -681,11 +659,97 @@ ts::UString ts::UString::Decimal(INT value,
 
 
 //----------------------------------------------------------------------------
+// Internal helpers for Decimal(), unsigned version.
+//----------------------------------------------------------------------------
+
+template<typename INT, typename std::enable_if<std::is_integral<INT>::value && std::is_unsigned<INT>::value>::type*>
+void ts::UString::DecimalHelper(UString& result, INT value, const UString& separator, bool force_sign)
+{
+    // Avoid reallocating (most of the time).
+    result.clear();
+    result.reserve(32);
+
+    // We build the result string IN REVERSE ORDER
+    // So, we need the separator in reverse order too.
+    UString sep(separator);
+    sep.reverse();
+
+    // Format the value
+    int count = 0;
+    do {
+        result.push_back(u'0' + UChar(value % 10));
+        value /= 10;
+        if (++count % 3 == 0 && value != 0) {
+            result.append(sep);
+        }
+    } while (value != 0);
+    if (force_sign) {
+        result.push_back(u'+');
+    }
+
+    // Reverse characters in the string
+    result.reverse();
+}
+
+
+//----------------------------------------------------------------------------
+// Internal helpers for Decimal(), signed version.
+//----------------------------------------------------------------------------
+
+template<typename INT, typename std::enable_if<std::is_integral<INT>::value && std::is_signed<INT>::value>::type*>
+void ts::UString::DecimalHelper(UString& result, INT value, const UString& separator, bool force_sign)
+{
+    // Unsigned version of the signed type (same size).
+    typedef typename std::make_unsigned<INT>::type UNSINT;
+
+    if (value == std::numeric_limits<INT>::min()) {
+        DecimalMostNegative<INT>(result, separator);
+    }
+    else if (value < 0) {
+        DecimalHelper<UNSINT>(result, static_cast<UNSINT>(-value), separator, false);
+        result.insert(0, 1, u'-');
+    }
+    else {
+        DecimalHelper<UNSINT>(result, static_cast<UNSINT>(value), separator, force_sign);
+    }
+}
+
+
+//----------------------------------------------------------------------------
+// Internal helper for Decimal() when the value is the most negative value of
+// a signed type (cannot be made positive inside the same signed type).
+//----------------------------------------------------------------------------
+
+template<typename INT, typename std::enable_if<std::is_integral<INT>::value && std::is_signed<INT>::value && sizeof(INT) == 8>::type*>
+void ts::UString::DecimalMostNegative(UString& result, const UString& separator)
+{
+    // Specialization for 64-bit signed type to avoid infinite recursion.
+    // Hard-coded value since there is no way to build it:
+    result = u"-9223372036854775808";
+    if (!separator.empty()) {
+        int count = 0;
+        for (size_t i = result.size() - 1; i > 0; --i) {
+            if (++count % 3 == 0) {
+                result.insert(i, separator);
+            }
+        }
+    }
+}
+
+template<typename INT, typename std::enable_if<std::is_integral<INT>::value && std::is_signed<INT>::value && sizeof(INT) < 8>::type*>
+void ts::UString::DecimalMostNegative(UString& result, const UString& separator)
+{
+    // INT is less than 64-bit long. Use an intermediate 64-bit conversion to have a valid positive value.
+    DecimalHelper<int64_t>(result, static_cast<int64_t>(std::numeric_limits<INT>::min()), separator, false);
+}
+
+
+//----------------------------------------------------------------------------
 // Format a string containing an hexadecimal value.
 //----------------------------------------------------------------------------
 
 template <typename INT, typename std::enable_if<std::is_integral<INT>::value>::type*>
-ts::UString ts::UString::Hexa(INT value,
+ts::UString ts::UString::Hexa(INT svalue,
                               size_type width,
                               const UString& separator,
                               bool use_prefix,
@@ -703,6 +767,10 @@ ts::UString ts::UString::Hexa(INT value,
     if (width == 0) {
         width = 2 * sizeof(INT);
     }
+
+    // In hexadecimal, always format the unsigned version of the binary value.
+    typedef typename std::make_unsigned<INT>::type UNSINT;
+    UNSINT value = static_cast<UNSINT>(svalue);
 
     // Format the value
     int count = 0;
@@ -740,7 +808,7 @@ ts::UString ts::UString::Hexa(INT value,
 //----------------------------------------------------------------------------
 
 template <typename INT, typename std::enable_if<std::is_integral<INT>::value>::type*>
-ts::UString ts::UString::HexaMin(INT value,
+ts::UString ts::UString::HexaMin(INT svalue,
                                  size_type min_width,
                                  const UString& separator,
                                  bool use_prefix,
@@ -761,6 +829,10 @@ ts::UString ts::UString::HexaMin(INT value,
     if (use_prefix && min_width >= 2) {
         min_width -= 2;
     }
+
+    // In hexadecimal, always format the unsigned version of the binary value.
+    typedef typename std::make_unsigned<INT>::type UNSINT;
+    UNSINT value = static_cast<UNSINT>(svalue);
 
     // Format the value
     for (size_type digit_count = 0; digit_count == 0 || digit_count < min_digit || s.size() < min_width || value != 0; digit_count++) {
@@ -825,4 +897,95 @@ void ts::UString::trimLength(INT length, bool trimTrailingSpaces)
     // and that it is safe to convert any positive value into this type.
     resize(std::min<size_type>(size(), size_type(std::max<INT>(0, length))));
     trim(false, trimTrailingSpaces);
+}
+
+
+//----------------------------------------------------------------------------
+// Convert a container of strings into one big string where all elements are
+// properly quoted when necessary.
+//----------------------------------------------------------------------------
+
+template <class CONTAINER>
+void ts::UString::quotedLine(const CONTAINER& container, UChar quoteCharacter, const UString& specialCharacters)
+{
+    clear();
+    for (auto it = container.begin(); it != container.end(); ++it) {
+        if (!empty()) {
+            append(SPACE);
+        }
+        append(it->toQuoted(quoteCharacter, specialCharacters));
+    }
+}
+
+template <class CONTAINER>
+ts::UString ts::UString::ToQuotedLine(const CONTAINER& container, UChar quoteCharacter, const UString& specialCharacters)
+{
+    UString result;
+    result.quotedLine(container, quoteCharacter, specialCharacters);
+    return result;
+}
+
+
+//----------------------------------------------------------------------------
+// Split this string in space-separated possibly-quoted elements.
+//----------------------------------------------------------------------------
+
+template <class CONTAINER>
+void ts::UString::fromQuotedLine(CONTAINER& container, const UString& quoteCharacters, const UString& specialCharacters) const
+{
+    container.clear();
+
+    // Loop on words.
+    size_type index = 0;
+    while (index < size()) {
+
+        // Skip spaces before next word.
+        while (index < size() && IsSpace(at(index))) {
+            ++index;
+        }
+
+        // Return when no more word is available.
+        if (index >= size()) {
+            return;
+        }
+
+        // Current word under construction.
+        UString word;
+        UChar quoteChar = CHAR_NULL;
+        bool quoteOpen = false;
+
+        // Accumulate characters from the current word.
+        while (index < size() && (quoteOpen || !IsSpace(at(index)))) {
+            UChar c = at(index++);
+            if (!quoteOpen && quoteCharacters.contain(c)) {
+                // Start of a quoted sequence.
+                quoteOpen = true;
+                quoteChar = c;
+            }
+            else if (quoteOpen && c == quoteChar) {
+                // End of quoted sequence.
+                quoteOpen = false;
+            }
+            else if (c == '\\' && index < size()) {
+                // Start of an escape sequence.
+                c = at(index++);
+                switch (c) {
+                    case u'b': c = BACKSPACE; break;
+                    case u'f': c = FORM_FEED; break;
+                    case u'n': c = LINE_FEED; break;
+                    case u'r': c = CARRIAGE_RETURN; break;
+                    case u't': c = HORIZONTAL_TABULATION; break;
+                    default: break;
+                }
+                word.push_back(c);
+            }
+            else {
+                // Just a regular character.
+                word.push_back(c);
+            }
+        }
+
+        // End of word, push it.
+        container.push_back(word);
+    }
 }

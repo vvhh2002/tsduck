@@ -190,9 +190,41 @@ namespace ts {
             //!
             bool isRealTime() const;
 
+            //!
+            //! Set the plugin in suspended more or resume it.
+            //! When suspended, a plugin no longer processes packets.
+            //! The packets are passed directly from the previous to the next plugin.
+            //! A plugin executor is typically suspended of resumed from another thread.
+            //! @param [in] suspended When true, set the plugin in suspended mode.
+            //! When false, resume the plugin if it is currently  suspended.
+            //!
+            void setSuspended(bool suspended) { _suspended = suspended; }
+
+            //!
+            //! Get the plugin suspension mode.
+            //! @return True when the plugin is suspended, false otherwise.
+            //!
+            bool getSuspended() const { return _suspended; }
+
+            //!
+            //! Restart the plugin with new parameters.
+            //! This method is called from another thread, not the plugin thread.
+            //! @param [in] params New command line parameters.
+            //! @param [in,out] report Where to report errors.
+            //!
+            void restart(const UStringVector& params, Report& report);
+
+            //!
+            //! Restart the plugin with same parameters.
+            //! This method is called from another thread, not the plugin thread.
+            //! @param [in,out] report Where to report errors.
+            //!
+            void restart(Report& report);
+
         protected:
             PacketBuffer*         _buffer;    //!< Description of shared packet buffer.
             PacketMetadataBuffer* _metadata;  //!< Description of shared packet metadata buffer.
+            volatile bool         _suspended; //!< The plugin is suspended / resumed.
 
             //!
             //! Pass processed packets to the next packet processor.
@@ -236,14 +268,45 @@ namespace ts {
             //!
             void waitWork(size_t& pkt_first, size_t& pkt_cnt, BitRate& bitrate, bool& input_end, bool& aborted, bool &timeout);
 
+            //!
+            //! Process a pending restart operation if there is one.
+            //! @return True in case of success (no pending restart or successfully restarted)
+            //! or false on fatal error (cannot even restart with the original parameters).
+            //!
+            bool processPendingRestart();
+
         private:
-            Condition _to_do;    // Notify processor to do something
+            // A structure which is used to handle a restart of the plugin.
+            class RestartData;
+            typedef SafePtr<RestartData,Mutex> RestartDataPtr;
 
             // The following private data must be accessed exclusively under the protection of the global mutex.
-            size_t  _pkt_first;  // Starting index of packets area
-            size_t  _pkt_cnt;    // Size of packets area
-            bool    _input_end;  // No more packet after current ones
-            BitRate _bitrate;    // Input bitrate (set by previous plugin)
+            Condition      _to_do;         // Notify processor to do something
+            size_t         _pkt_first;     // Starting index of packets area
+            size_t         _pkt_cnt;       // Size of packets area
+            bool           _input_end;     // No more packet after current ones
+            BitRate        _bitrate;       // Input bitrate (set by previous plugin)
+            bool           _restart;       // Restart the plugni asap using _restart_data
+            RestartDataPtr _restart_data;  // How to restart the plugin
+
+            // Description of a restart operation.
+            class RestartData
+            {
+                TS_NOBUILD_NOCOPY(RestartData);
+            public:
+                // Constructor.
+                RestartData(const UStringVector& params, bool same, Report& rep);
+
+                Report&       report;      // Report progress and error messages.
+                bool          same_args;   // Use same args as previously.
+                UStringVector args;        // New command line parameters for the plugin (read-only).
+                Mutex         mutex;       // Mutex to protect the following fields.
+                Condition     condition;   // Condition to report the end of restart (for the requesting thread).
+                bool          completed;   // End of operation, restarted or aborted.
+            };
+
+            // Restart this plugin.
+            void restart(const RestartDataPtr&);
         };
     }
 }

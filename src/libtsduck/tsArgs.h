@@ -110,7 +110,7 @@ namespace ts {
     //! For integer values, the minimum and maximum allowed values are specified
     //! and the actual values for the command line are checked for valid integer
     //! values. The integer values can be entered in decimal or hexadecimal
-    //! (using the 0x prefix). The comma, dot and space characters are considered
+    //! (using the 0x prefix). The comma and space characters are considered
     //! as possible "thousands separators" and are ignored.
     //!
     //! <h3>Error management</h3>
@@ -353,6 +353,10 @@ namespace ts {
         //! @param [in] min_value Minimum value, ignored if @a type is not @link INTEGER @endlink.
         //! @param [in] max_value Maximum value, ignored if @a type is not @link INTEGER @endlink.
         //! @param [in] optional  When true, the option's value is optional.
+        //! @param [in] decimals Reference number of decimal digits. When @a decimals is greater than
+        //! zero, the result is automatically adjusted by the corresponding power of ten. For instance,
+        //! when @a decimals is 3, u"12" returns 12000, u"12.34" returns 12340 and "12.345678" returns 12345.
+        //! All extra decimals are accepted but ignored.
         //! @return A reference to this instance.
         //!
         Args& option(const UChar* name = nullptr,
@@ -362,7 +366,8 @@ namespace ts {
                      size_t       max_occur = 0,
                      int64_t      min_value = 0,
                      int64_t      max_value = 0,
-                     bool         optional = false);
+                     bool         optional = false,
+                     size_t       decimals = 0);
 
         //!
         //! Add the definition of an option, the value being from an enumeration type.
@@ -468,6 +473,13 @@ namespace ts {
         virtual void setIntro(const UString& intro);
 
         //!
+        //! Set the conclusion or tailing text for help description.
+        //!
+        //! @param [in] tail Tailing text.
+        //!
+        virtual void setTail(const UString& tail);
+
+        //!
         //! Set the option flags of the command.
         //!
         //! @param [in] flags Define various options, a combination of or'ed values from @link Flags @endlink.
@@ -513,12 +525,24 @@ namespace ts {
         static const Enumeration HelpFormatEnum;
 
         //!
+        //! Default line width for help texts.
+        //!
+        static constexpr size_t DEFAULT_LINE_WIDTH = 79;
+
+        //!
         //! Get a formatted help text.
         //! @param [in] format Requested format of the help text.
         //! @param [in] line_width Maximum width of text lines.
         //! @return The formatted help text.
         //!
-        UString getHelpText(HelpFormat format, size_t line_width = 79) const;
+        virtual UString getHelpText(HelpFormat format, size_t line_width = DEFAULT_LINE_WIDTH) const;
+
+        //!
+        //! Set the initial application name (will be overwritten at next command analysis).
+        //!
+        //! @param [in] name Application name string.
+        //!
+        void setAppName(const UString& name) {_app_name = name;}
 
         //!
         //! Set the "shell" string.
@@ -538,6 +562,27 @@ namespace ts {
         //! @see setShell()
         //!
         const UString& getShell() const {return _shell;}
+
+        //!
+        //! Load command arguments and analyze them.
+        //!
+        //! Normally, in case of error or if @c -\-help or @c -\-version is specified, the
+        //! application is automatically terminated. If some flags prevent the termination
+        //! of the application, return @c true if the command is correct, @c false
+        //! if the command is incorrect or @c -\-help or @c -\-version is specified.
+        //!
+        //! @param [in] command Full command line, with application name and parameters.
+        //! Parameters are separated with spaces. Special characters and spaces must be
+        //! escaped or quoted in the parameters.
+        //! @param [in] processRedirections If true (the default), process command line arguments
+        //! redirection. All lines with the form @c '\@filename' are replaced by the content
+        //! of @a filename.
+        //! @return By default, always return true or the application is automatically
+        //! terminated in case of error. If some flags prevent the termination
+        //! of the application, return @c true if the command is correct, @c false
+        //! if the command is incorrect or @c -\-help or @c -\-version is specified.
+        //!
+        virtual bool analyze(const UString& command, bool processRedirections = true);
 
         //!
         //! Load command arguments and analyze them.
@@ -599,6 +644,22 @@ namespace ts {
         //! @return The application name from the last command line analysis.
         //!
         UString appName() const {return _app_name;}
+
+        //!
+        //! Get the command line parameters from the last command line analysis.
+        //!
+        //! @param [out] args The command parameters from the last command line analysis.
+        //!
+        void getCommandArgs(UStringVector& args) const { args = _args; }
+
+        //!
+        //! Get the full command line from the last command line analysis.
+        //!
+        //! @return The full command line from the last command line analysis.
+        //! It contains the application name and arguments. Special characters
+        //! are escaped or quoted.
+        //!
+        UString commandLine() const;
 
         //!
         //! Check if an option is present in the last analyzed command line.
@@ -681,7 +742,7 @@ namespace ts {
         template <typename INT, typename std::enable_if<std::is_integral<INT>::value>::type* = nullptr>
         void getIntValue(INT& value,
                          const UChar* name = nullptr,
-                         const INT& def_value = static_cast<INT>(0),
+                         const INT def_value = static_cast<INT>(0),
                          size_t index = 0) const;
 
         //!
@@ -700,7 +761,7 @@ namespace ts {
         //!
         template <typename INT, typename std::enable_if<std::is_integral<INT>::value>::type* = nullptr>
         INT intValue(const UChar* name = nullptr,
-                     const INT& def_value = static_cast<INT>(0),
+                     const INT def_value = static_cast<INT>(0),
                      size_t index = 0) const;
 
         //!
@@ -867,8 +928,9 @@ namespace ts {
         //! Redirect report logging.
         //!
         //! @param [in] report Where to report errors. The redirection is cancelled if zero.
+        //! @return The previous redirected report.
         //!
-        void redirectReport(Report* report);
+        Report* redirectReport(Report* report);
 
         // Inherited from Report.
         virtual void raiseMaxSeverity(int level) override;
@@ -925,6 +987,7 @@ namespace ts {
             size_t         max_occur;   // Maximum occurence
             int64_t        min_value;   // Minimum value (for integer args)
             int64_t        max_value;   // Maximum value (for integer args)
+            size_t         decimals;    // Number of meaningful decimal digits
             uint32_t       flags;       // Option flags
             Enumeration    enumeration; // Enumeration values (if not empty)
             UString        syntax;      // Syntax of value (informational, "address:port" for instance)
@@ -940,6 +1003,7 @@ namespace ts {
                     size_t       max_occur,
                     int64_t      min_value,
                     int64_t      max_value,
+                    size_t       decimals,
                     uint32_t     flags);
 
             // Constructor:
@@ -956,6 +1020,12 @@ namespace ts {
             // Description of the option value.
             enum ValueContext {ALONE, SHORT, LONG};
             UString valueDescription(ValueContext ctx) const;
+
+            // When the option has an Enumeration type, get a list of all valid names.
+            UString optionNames(const UString& separator) const;
+
+            // Complete option help text.
+            UString helpText(size_t line_width) const;
 
             // Check if an integer value is in range.
             template <typename INT, typename std::enable_if<std::is_same<INT, uint64_t>::value>::type* = nullptr>
@@ -975,19 +1045,21 @@ namespace ts {
         UString       _shell;
         UString       _syntax;
         UString       _intro;
+        UString       _tail;
         UString       _app_name;
         UStringVector _args;
         bool          _is_valid;
         int           _flags;
 
-        // List of characters which are allowed thousands separators in integer values
+        // List of characters which are allowed thousands separators and decimal points in integer values
         static const UChar* const THOUSANDS_SEPARATORS;
-
-        // Common code: analyze the command line.
-        bool analyze(bool processRedirections);
+        static const UChar* const DECIMAL_POINTS;
 
         // Add a new option.
         void addOption(const IOption& opt);
+
+        // Adjust predefined options based on flags.
+        void adjustPredefinedOptions();
 
         // Validate the content of an option, add the value,
         // compute integer values when necessary, return false if not valid.
@@ -997,13 +1069,9 @@ namespace ts {
         void processHelp();
         void processVersion();
 
-        // Format help lines from a long text.
-        // Always terminated with a new line.
-        // Indentation level:
-        // - 0 : Titles, typically no indentation.
-        // - 1 : Description of parameters, option names.
-        // - 2 : Description of options.
-        static UString HelpLines(int level, const UString& text, size_t line_width);
+        // Format help lines from a long text. Always terminated with a new line.
+        enum IndentationContext {TITLE, PARAMETER_DESC, OPTION_NAME, OPTION_DESC};
+        static UString HelpLines(IndentationContext level, const UString& text, size_t line_width);
 
         // Format the help options of the command.
         UString formatHelpOptions(size_t line_width) const;

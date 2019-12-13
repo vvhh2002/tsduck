@@ -2,7 +2,23 @@ TSDUCK CHANGE LOG AND RELEASE NOTES
 
 -------------------------------------------------------------------------------
 
-VERSION 3.19-1500
+VERSION 3.20-1553
+
+[NEW] New commands and plugins:
+
+  * Added command "tspcontrol" to send control commands to a running "tsp".
+
+[IMP] Improvements on existing commands and plugins:
+
+  * Added option --control-port to "tsp" and other related --control options.
+  * Added option --eit-date-only to plugin "timeref".
+  * Option --buffer-size-mb of "tsp" now accepts decimal values (eg. "0.5").
+  * Added options --local-time-offset, --next-change, --next-time-offset,
+    --only-country name and --only-region to plugin "timeref".
+
+-------------------------------------------------------------------------------
+
+VERSION 3.19-1516
 
 [NEW] New commands and plugins:
 
@@ -21,6 +37,10 @@ VERSION 3.19-1500
   * Complete ATSC signalization, as defined in A/65, is now supported.
   * NorDig-private descriptors are supported.
   * Added option --power-mode to "tsdektec" and output plugin "dektec".
+  * Added options --build-service-list-descriptors and --default-service-type
+    to plugin "nit".
+  * Added options --start and --stop to plugin "trigger".
+  * Added option --local-port to plugins "ip" (output) and "mpe".
   * Service id or name is now optional in plugin "svrename". When omitted, the
     default service is the first one in the PAT.
   * On Linux, multi-standard tuners are now supported (for instance tuners

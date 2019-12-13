@@ -852,6 +852,19 @@ namespace ts {
         UString toRemovedSuffix(const UString& suffix, CaseSensitivity cs = CASE_SENSITIVE) const;
 
         //!
+        //! Indent all lines in the string.
+        //! @param [in] size Number of spaces to add at the beginning of each line.
+        //!
+        void indent(size_t size);
+
+        //!
+        //! Indent all lines in the string.
+        //! @param [in] size Number of spaces to add at the beginning of each line.
+        //! @return A copy of this string with indented lines.
+        //!
+        UString toIndented(size_t size) const;
+
+        //!
         //! Check if the string starts with a specified prefix.
         //! @param [in] prefix A string prefix to check.
         //! @param [in] cs Indicate if the comparison is case-sensitive.
@@ -860,10 +873,17 @@ namespace ts {
         bool startWith(const UString& prefix, CaseSensitivity cs = CASE_SENSITIVE) const;
 
         //!
+        //! Check if a string contains a specified character.
+        //! @param [in] c A character to check.
+        //! @return True if this string contains @a c, false otherwise.
+        //!
+        bool contain(UChar c) const;
+
+        //!
         //! Check if a string contains a specified substring.
         //! @param [in] substring A substring to check.
         //! @param [in] cs Indicate if the comparison is case-sensitive.
-        //! @return True if this string contains @a sunstring, false otherwise.
+        //! @return True if this string contains @a substring, false otherwise.
         //!
         bool contain(const UString& substring, CaseSensitivity cs = CASE_SENSITIVE) const;
 
@@ -1099,6 +1119,75 @@ namespace ts {
         //! @return The justified string.
         //!
         UString toJustified(const UString& right, size_type width, UChar pad = SPACE, size_t spacesAroundPad = 0) const;
+
+        //!
+        //! The default list of characters to be protected by quoted().
+        //!
+        static const UString DEFAULT_SPECIAL_CHARACTERS;
+
+        //!
+        //! The default list of acceptable quote characters.
+        //!
+        static const UString DEFAULT_QUOTE_CHARACTERS;
+
+        //!
+        //! Replace the string with a "quoted" version of it.
+        //! If this string contains any space character or any character from @a specialCharacters,
+        //! then the string is replaced with a value surrounded by the @a quoteCharacter and
+        //! all special characters are properly escaped using a backslash.
+        //! @param [in] quoteCharacter The character to be used as quote.
+        //! @param [in] specialCharacters The list of special characters.
+        //! The @a quoteCharacter is implicitly part of @a specialCharacters.
+        //! @param [in] forceQuote If true, force quote, even if the content does not require it.
+        //!
+        void quoted(UChar quoteCharacter = u'\'', const UString& specialCharacters = DEFAULT_SPECIAL_CHARACTERS, bool forceQuote = false);
+
+        //!
+        //! Return a "quoted" version of this string.
+        //! @param [in] quoteCharacter The character to be used as quote.
+        //! @param [in] specialCharacters The list of special characters.
+        //! The @a quoteCharacter is implicitly part of @a specialCharacters.
+        //! @param [in] forceQuote If true, force quote, even if the content does not require it.
+        //! @return A "quoted" version of this string.
+        //! @see quoted()
+        //!
+        UString toQuoted(UChar quoteCharacter = u'\'', const UString& specialCharacters = DEFAULT_SPECIAL_CHARACTERS, bool forceQuote = false) const;
+
+        //!
+        //! Convert a container of strings into one big string where all elements are properly quoted when necessary.
+        //! This string object receives the final line with quoted elements.
+        //! @tparam CONTAINER A container class of @c UString as defined by the C++ Standard Template Library (STL).
+        //! @param [in] container A container of @c UString containing all elements.
+        //! @param [in] quoteCharacter The character to be used as quote.
+        //! @param [in] specialCharacters The list of special characters.
+        //! The @a quoteCharacter is implicitly part of @a specialCharacters.
+        //!
+        template <class CONTAINER>
+        void quotedLine(const CONTAINER& container, UChar quoteCharacter = u'\'', const UString& specialCharacters = DEFAULT_SPECIAL_CHARACTERS);
+
+        //!
+        //! Convert a container of strings into one big string where all elements are properly quoted when necessary.
+        //! @tparam CONTAINER A container class of @c UString as defined by the C++ Standard Template Library (STL).
+        //! @param [in] container A container of @c UString containing all elements.
+        //! @param [in] quoteCharacter The character to be used as quote.
+        //! @param [in] specialCharacters The list of special characters.
+        //! The @a quoteCharacter is implicitly part of @a specialCharacters.
+        //! @return The final line with quoted elements.
+        //!
+        template <class CONTAINER>
+        static UString ToQuotedLine(const CONTAINER& container, UChar quoteCharacter = u'\'', const UString& specialCharacters = DEFAULT_SPECIAL_CHARACTERS);
+
+        //!
+        //! Split this string in space-separated possibly-quoted elements.
+        //! @tparam CONTAINER A container class of @c UString as defined by the C++ Standard Template Library (STL).
+        //! @param [out] container A container of @c UString receiving all unquoted elements.
+        //! @param [in] quoteCharacters All characters which are recognized as quote at the beginning of an element.
+        //! @param [in] specialCharacters The list of special characters.
+        //! The @a quoteCharacter is implicitly part of @a specialCharacters.
+        //! @see quoted()
+        //!
+        template <class CONTAINER>
+        void fromQuotedLine(CONTAINER& container, const UString& quoteCharacters = DEFAULT_QUOTE_CHARACTERS, const UString& specialCharacters = DEFAULT_SPECIAL_CHARACTERS) const;
 
         //!
         //! Convert the string into a suitable HTML representation.
@@ -1403,10 +1492,19 @@ namespace ts {
         //! separators and are ignored. <i>Any character</i> from the @a thousandSeparators string
         //! is interpreted as a separator. Note that this implies that the optional thousands separators
         //! may have one character only.
+        //! @param [in] decimals Reference number of decimal digits. When @a decimals is greater than
+        //! zero, the result is automatically adjusted by the corresponding power of ten. For instance,
+        //! when @a decimals is 3, u"12" returns 12000, u"12.34" returns 12340 and "12.345678" returns 12345.
+        //! All extra decimals are accepted but ignored.
+        //! @param [in] decimalSeparators A string of characters which are interpreted as decimal point.
+        //! A decimal point is allowed only in base 10.
         //! @return True on success, false on error (invalid string).
         //!
         template <typename INT, typename std::enable_if<std::is_integral<INT>::value>::type* = nullptr>
-        bool toInteger(INT& value, const UString& thousandSeparators = UString()) const;
+        bool toInteger(INT& value,
+                       const UString& thousandSeparators = UString(),
+                       size_type decimals = 0,
+                       const UString& decimalSeparators = UString(u".")) const;
 
         //!
         //! Convert a string containing a list of integers into a container of integers.
@@ -1428,10 +1526,20 @@ namespace ts {
         //! Distinct integer values must be separated by one or more of these separators.
         //! <i>Any character</i> from the @a listSeparators string is interpreted as a separator.
         //! Note that this implies that the list separators may have one character only.
+        //! @param [in] decimals Reference number of decimal digits. When @a decimals is greater than
+        //! zero, the result is automatically adjusted by the corresponding power of ten. For instance,
+        //! when @a decimals is 3, u"12" returns 12000, u"12.34" returns 12340 and "12.345678" returns 12345.
+        //! All extra decimals are accepted but ignored.
+        //! @param [in] decimalSeparators A string of characters which are interpreted as decimal point.
+        //! A decimal point is allowed only in base 10.
         //! @return True on success, false on error (invalid string).
         //!
         template <class CONTAINER, typename std::enable_if<std::is_integral<typename CONTAINER::value_type>::value>::type* = nullptr>
-        bool toIntegers(CONTAINER& container, const UString& thousandSeparators = UString(), const UString& listSeparators = UString(u",; ")) const;
+        bool toIntegers(CONTAINER& container,
+                        const UString& thousandSeparators = UString(),
+                        const UString& listSeparators = UString(u",; "),
+                        size_type decimals = 0,
+                        const UString& decimalSeparators = UString(u".")) const;
 
         //!
         //! Format a string containing a decimal value.
@@ -1999,6 +2107,30 @@ namespace ts {
 #endif
 
     private:
+        // Internal helpers for toInteger(), signed and unsigned versions.
+        // Work on trimmed strings, with leading '+' skipped.
+        template<typename INT, typename std::enable_if<std::is_integral<INT>::value && std::is_unsigned<INT>::value>::type* = nullptr>
+        static bool ToIntegerHelper(const UChar* start, const UChar* end, INT& value, const UString& thousandSeparators, size_type decimals, const UString& decimalSeparators);
+
+        template<typename INT, typename std::enable_if<std::is_integral<INT>::value && std::is_signed<INT>::value>::type* = nullptr>
+        static bool ToIntegerHelper(const UChar* start, const UChar* end, INT& value, const UString& thousandSeparators, size_type decimals, const UString& decimalSeparators);
+
+        // Internal helpers for Decimal(), signed and unsigned versions.
+        // Produce unpadded strings.
+        template<typename INT, typename std::enable_if<std::is_integral<INT>::value && std::is_unsigned<INT>::value>::type* = nullptr>
+        static void DecimalHelper(UString& result, INT value, const UString& separator, bool force_sign);
+
+        template<typename INT, typename std::enable_if<std::is_integral<INT>::value && std::is_signed<INT>::value>::type* = nullptr>
+        static void DecimalHelper(UString& result, INT value, const UString& separator, bool force_sign);
+
+        // Internal helper for Decimal() when the value is the most negative value of a signed type.
+        // This negative value cannot be made positive inside the same signed type.
+        template<typename INT, typename std::enable_if<std::is_integral<INT>::value && std::is_signed<INT>::value && sizeof(INT) == 8>::type* = nullptr>
+        static void DecimalMostNegative(UString& result, const UString& separator);
+
+        template<typename INT, typename std::enable_if<std::is_integral<INT>::value && std::is_signed<INT>::value && sizeof(INT) < 8>::type* = nullptr>
+        static void DecimalMostNegative(UString& result, const UString& separator);
+
         //!
         //! Analysis context of a Format or Scan string, base class.
         //!

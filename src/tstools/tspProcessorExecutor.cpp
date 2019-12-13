@@ -69,7 +69,6 @@ void ts::tsp::ProcessorExecutor::main()
 
     do {
         // Wait for packets to process
-
         size_t pkt_first = 0;
         size_t pkt_cnt = 0;
         bool timeout = false;
@@ -78,13 +77,16 @@ void ts::tsp::ProcessorExecutor::main()
         // If bit rate was never modified by the plugin, always copy the
         // input bitrate as output bitrate. Otherwise, keep previous
         // output bitrate, as modified by the plugin.
-
         if (bitrate_never_modified) {
             output_bitrate = _tsp_bitrate;
         }
 
-        // In case of abort on timeout, notify previous and next plugin, then exit.
+        // Process restart requests.
+        if (!processPendingRestart()) {
+            timeout = true;
+        }
 
+        // In case of abort on timeout, notify previous and next plugin, then exit.
         if (timeout) {
             passPackets(0, output_bitrate, true, true);
             aborted = true;
@@ -93,7 +95,6 @@ void ts::tsp::ProcessorExecutor::main()
 
         // If next processor has aborted, abort as well.
         // We call passPacket to inform our predecessor that we aborted.
-
         if (aborted && !input_end) {
             passPackets(0, output_bitrate, true, true);
             break;
@@ -101,14 +102,12 @@ void ts::tsp::ProcessorExecutor::main()
 
         // Exit thread if no more packet to process.
         // We call passPackets to inform our successor of end of input.
-
         if (pkt_cnt == 0 && input_end) {
             passPackets(0, output_bitrate, true, false);
             break;
         }
 
         // Now process the packets.
-
         size_t pkt_done = 0;
         size_t pkt_flush = 0;
 
@@ -130,14 +129,14 @@ void ts::tsp::ProcessorExecutor::main()
                 pkt_data->setFlush(false);
                 pkt_data->setBitrateChanged(false);
                 ProcessorPlugin::Status status = ProcessorPlugin::TSP_OK;
-                if (only_labels.none() || pkt_data->hasAnyLabel(only_labels)) {
+                if (!_suspended && (only_labels.none() || pkt_data->hasAnyLabel(only_labels))) {
                     // Either no --only-label option or the packet has a specified label => process it.
                     status = _processor->processPacket(*pkt, *pkt_data);
                     addPluginPackets(1);
                 }
                 else {
-                    // Some --only-label was specified but the packet does not have any required label.
-                    // Pass the packet without submitting it to the plugin.
+                    // The plugin is suspended or some --only-label was specified but the packet does
+                    // not have any required label. Pass the packet without submitting it to the plugin.
                     addNonPluginPackets(1);
                 }
 

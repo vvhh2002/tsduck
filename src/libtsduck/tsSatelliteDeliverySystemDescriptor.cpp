@@ -26,10 +26,6 @@
 // THE POSSIBILITY OF SUCH DAMAGE.
 //
 //----------------------------------------------------------------------------
-//
-//  Representation of a satellite_delivery_system_descriptor
-//
-//----------------------------------------------------------------------------
 
 #include "tsSatelliteDeliverySystemDescriptor.h"
 #include "tsDescriptor.h"
@@ -48,17 +44,17 @@ TS_FACTORY_REGISTER(ts::SatelliteDeliverySystemDescriptor::DisplayDescriptor, ts
 
 
 //----------------------------------------------------------------------------
-// Default constructor:
+// Constructors
 //----------------------------------------------------------------------------
 
 ts::SatelliteDeliverySystemDescriptor::SatelliteDeliverySystemDescriptor() :
     AbstractDeliverySystemDescriptor(MY_DID, DS_DVB_S, MY_XML_NAME),
     frequency(0),
     orbital_position(0),
-    eastNotWest(false),
+    east_not_west(false),
     polarization(0),
     roll_off(0),
-    dvbS2(false),
+    dvb_s2(false),
     modulation_type(0),
     symbol_rate(0),
     FEC_inner(0)
@@ -66,24 +62,20 @@ ts::SatelliteDeliverySystemDescriptor::SatelliteDeliverySystemDescriptor() :
     _is_valid = true;
 }
 
-
-//----------------------------------------------------------------------------
-// Constructor from a binary descriptor
-//----------------------------------------------------------------------------
-
 ts::SatelliteDeliverySystemDescriptor::SatelliteDeliverySystemDescriptor(DuckContext& duck, const Descriptor& desc) :
-    AbstractDeliverySystemDescriptor(MY_DID, DS_DVB_S, MY_XML_NAME),
-    frequency(0),
-    orbital_position(0),
-    eastNotWest(false),
-    polarization(0),
-    roll_off(0),
-    dvbS2(false),
-    modulation_type(0),
-    symbol_rate(0),
-    FEC_inner(0)
+    SatelliteDeliverySystemDescriptor()
 {
     deserialize(duck, desc);
+}
+
+
+//----------------------------------------------------------------------------
+// Delivery descriptor depends on the descriptor fields.
+//----------------------------------------------------------------------------
+
+ts::DeliverySystem ts::SatelliteDeliverySystemDescriptor::deliverySystem() const
+{
+    return dvb_s2 ? DS_DVB_S2 : DS_DVB_S;
 }
 
 
@@ -94,15 +86,14 @@ ts::SatelliteDeliverySystemDescriptor::SatelliteDeliverySystemDescriptor(DuckCon
 void ts::SatelliteDeliverySystemDescriptor::serialize(DuckContext& duck, Descriptor& desc) const
 {
     ByteBlockPtr bbp(serializeStart());
-    EncodeBCD(bbp->enlarge(4), 8, frequency);
-    EncodeBCD(bbp->enlarge(2), 4, orbital_position);
-    bbp->appendUInt8((eastNotWest ? 0x80 : 0x00) |
+    bbp->appendBCD(uint32_t(frequency / 10000), 8); // coded in 10 kHz units
+    bbp->appendBCD(orbital_position, 4);
+    bbp->appendUInt8((east_not_west ? 0x80 : 0x00) |
                      uint8_t((polarization & 0x03) << 5) |
-                     (dvbS2 ? uint8_t((roll_off & 0x03) << 3) : 0x00) |
-                     (dvbS2 ? 0x04 : 0x00) |
+                     (dvb_s2 ? uint8_t((roll_off & 0x03) << 3) : 0x00) |
+                     (dvb_s2 ? 0x04 : 0x00) |
                      (modulation_type & 0x03));
-    EncodeBCD(bbp->enlarge(4), 7, symbol_rate);
-    bbp->back() = (bbp->back() & 0xF0) | (FEC_inner & 0x0F);
+    bbp->appendBCD(uint32_t(symbol_rate / 100), 7, true, FEC_inner); // coded in 100 sym/s units, FEC in last nibble
     serializeEnd(desc, bbp);
 }
 
@@ -119,14 +110,14 @@ void ts::SatelliteDeliverySystemDescriptor::deserialize(DuckContext& duck, const
 
     const uint8_t* data = desc.payload();
 
-    frequency = DecodeBCD(data, 8);
+    frequency = 10000 * uint64_t(DecodeBCD(data, 8)); // coded in 10 kHz units
     orbital_position = uint16_t(DecodeBCD(data + 4, 4));
-    eastNotWest = (data[6] & 0x80) != 0;
+    east_not_west = (data[6] & 0x80) != 0;
     polarization = (data[6] >> 5) & 0x03;
-    dvbS2 = (data[6] & 0x04) != 0;
-    roll_off = dvbS2 ? ((data[6] >> 3) & 0x03) : 0x00;
+    dvb_s2 = (data[6] & 0x04) != 0;
+    roll_off = dvb_s2 ? ((data[6] >> 3) & 0x03) : 0x00;
     modulation_type = data[6] & 0x03;
-    symbol_rate = DecodeBCD(data + 7, 7);
+    symbol_rate = 100 * uint64_t(DecodeBCD(data + 7, 7, true)); // coded in 100 sym/s units
     FEC_inner = data[10] & 0x0F;
 }
 
@@ -135,51 +126,49 @@ void ts::SatelliteDeliverySystemDescriptor::deserialize(DuckContext& duck, const
 // Enumerations for XML.
 //----------------------------------------------------------------------------
 
-namespace {
-    const ts::Enumeration DirectionNames({
-        {u"west", 0},
-        {u"east", 1},
-    });
+const ts::Enumeration ts::SatelliteDeliverySystemDescriptor::DirectionNames({
+    {u"west", 0},
+    {u"east", 1},
+});
 
-    const ts::Enumeration PolarizationNames({
-        {u"horizontal", 0},
-        {u"vertical", 1},
-        {u"left", 2},
-        {u"right", 3},
-    });
+const ts::Enumeration ts::SatelliteDeliverySystemDescriptor::PolarizationNames({
+    {u"horizontal", 0},
+    {u"vertical",   1},
+    {u"left",       2},
+    {u"right",      3},
+});
 
-    const ts::Enumeration RollOffNames({
-        {u"0.35", 0},
-        {u"0.25", 1},
-        {u"0.20", 2},
-        {u"reserved", 3},
-    });
+const ts::Enumeration ts::SatelliteDeliverySystemDescriptor::RollOffNames({
+    {u"0.35",     0},
+    {u"0.25",     1},
+    {u"0.20",     2},
+    {u"reserved", 3},
+});
 
-    const ts::Enumeration SystemNames({
-        {u"DVB-S", 0},
-        {u"DVB-S2", 1},
-    });
+const ts::Enumeration ts::SatelliteDeliverySystemDescriptor::SystemNames({
+    {u"DVB-S",  0},
+    {u"DVB-S2", 1},
+});
 
-    const ts::Enumeration ModulationNames({
-        {u"auto", 0},
-        {u"QPSK", 1},
-        {u"8PSK", 2},
-        {u"16-QAM", 3},
-    });
+const ts::Enumeration ts::SatelliteDeliverySystemDescriptor::ModulationNames({
+    {u"auto",   0},
+    {u"QPSK",   1},
+    {u"8PSK",   2},
+    {u"16-QAM", 3},
+});
 
-    const ts::Enumeration CodeRateNames({
-        {u"undefined", 0},
-        {u"1/2", 1},
-        {u"2/3", 2},
-        {u"3/4", 3},
-        {u"5/6", 4},
-        {u"7/8", 5},
-        {u"8/9", 6},
-        {u"3/5", 7},
-        {u"4/5", 8},
-        {u"9/10", 9},
-    });
-}
+const ts::Enumeration ts::SatelliteDeliverySystemDescriptor::CodeRateNames({
+    {u"undefined", 0},
+    {u"1/2",  1},
+    {u"2/3",  2},
+    {u"3/4",  3},
+    {u"5/6",  4},
+    {u"7/8",  5},
+    {u"8/9",  6},
+    {u"3/5",  7},
+    {u"4/5",  8},
+    {u"9/10", 9},
+});
 
 
 //----------------------------------------------------------------------------
@@ -188,14 +177,14 @@ namespace {
 
 void ts::SatelliteDeliverySystemDescriptor::buildXML(DuckContext& duck, xml::Element* root) const
 {
-    root->setIntAttribute(u"frequency", 10000 * uint64_t(frequency), false);
+    root->setIntAttribute(u"frequency", frequency, false);
     root->setAttribute(u"orbital_position", UString::Format(u"%d.%d", {orbital_position / 10, orbital_position % 10}));
-    root->setIntEnumAttribute(DirectionNames, u"west_east_flag", eastNotWest);
+    root->setIntEnumAttribute(DirectionNames, u"west_east_flag", east_not_west);
     root->setIntEnumAttribute(PolarizationNames, u"polarization", polarization);
     root->setIntEnumAttribute(RollOffNames, u"roll_off", roll_off);
-    root->setIntEnumAttribute(SystemNames, u"modulation_system", dvbS2);
+    root->setIntEnumAttribute(SystemNames, u"modulation_system", dvb_s2);
     root->setIntEnumAttribute(ModulationNames, u"modulation_type", modulation_type);
-    root->setIntAttribute(u"symbol_rate", 100 * uint64_t(symbol_rate), false);
+    root->setIntAttribute(u"symbol_rate", symbol_rate, false);
     root->setIntEnumAttribute(CodeRateNames, u"FEC_inner", FEC_inner);
 }
 
@@ -206,26 +195,21 @@ void ts::SatelliteDeliverySystemDescriptor::buildXML(DuckContext& duck, xml::Ele
 
 void ts::SatelliteDeliverySystemDescriptor::fromXML(DuckContext& duck, const xml::Element* element)
 {
-    uint64_t freq = 0;
-    uint64_t symrate = 0;
     UString orbit;
 
     _is_valid =
         checkXMLName(element) &&
-        element->getIntAttribute<uint64_t>(freq, u"frequency", true) &&
+        element->getIntAttribute<uint64_t>(frequency, u"frequency", true) &&
         element->getAttribute(orbit, u"orbital_position", true) &&
-        element->getIntEnumAttribute(eastNotWest, DirectionNames, u"west_east_flag", true) &&
+        element->getIntEnumAttribute(east_not_west, DirectionNames, u"west_east_flag", true) &&
         element->getIntEnumAttribute(polarization, PolarizationNames, u"polarization", true) &&
         element->getIntEnumAttribute<uint8_t>(roll_off, RollOffNames, u"roll_off", false, 0) &&
-        element->getIntEnumAttribute(dvbS2, SystemNames, u"modulation_system", false, false) &&
+        element->getIntEnumAttribute(dvb_s2, SystemNames, u"modulation_system", false, false) &&
         element->getIntEnumAttribute<uint8_t>(modulation_type, ModulationNames, u"modulation_type", false, 1) &&
-        element->getIntAttribute<uint64_t>(symrate, u"symbol_rate", true) &&
+        element->getIntAttribute<uint64_t>(symbol_rate, u"symbol_rate", true) &&
         element->getIntEnumAttribute(FEC_inner, CodeRateNames, u"FEC_inner", true);
 
     if (_is_valid) {
-        frequency = uint32_t(freq / 10000);
-        symbol_rate = uint32_t(symrate / 100);
-
         // Expected orbital position is "XX.X" as in "19.2".
         UStringVector fields;
         uint16_t p1 = 0;
@@ -261,7 +245,7 @@ void ts::SatelliteDeliverySystemDescriptor::DisplayDescriptor(TablesDisplay& dis
         std::string freq, srate, orbital;
         BCDToString(freq, data, 8, 3);
         BCDToString(orbital, data + 4, 4, 3);
-        BCDToString(srate, data + 7, 7, 3);
+        BCDToString(srate, data + 7, 7, 3, true);
         data += 11; size -= 11;
 
         strm << margin << "Orbital position: " << orbital
