@@ -1,7 +1,7 @@
 //----------------------------------------------------------------------------
 //
 // TSDuck - The MPEG Transport Stream Toolkit
-// Copyright (c) 2005-2019, Thierry Lelegard
+// Copyright (c) 2005-2020, Thierry Lelegard
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -162,7 +162,7 @@ ts::Args::IOption::IOption(const UChar* name_,
             break;
         case INT32:
             min_value = -TS_CONST64(0x80000000);
-            max_value = 0x7FFFFFFFF;
+            max_value = 0x7FFFFFFF;
             type = INTEGER;
             break;
         default:
@@ -1143,7 +1143,7 @@ ts::UString ts::Args::getHelpText(HelpFormat format, size_t line_width) const
                 return _app_name + u" " + _syntax;
             }
             else {
-                return _shell + u" " + _app_name + u" " + _syntax;;
+                return _shell + u" " + _app_name + u" " + _syntax;
             }
         }
         case HELP_SYNTAX: {

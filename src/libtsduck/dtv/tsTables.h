@@ -1,7 +1,7 @@
 //----------------------------------------------------------------------------
 //
 // TSDuck - The MPEG Transport Stream Toolkit
-// Copyright (c) 2005-2019, Thierry Lelegard
+// Copyright (c) 2005-2020, Thierry Lelegard
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -62,7 +62,9 @@
 
 #include "tsAACDescriptor.h"
 #include "tsAdaptationFieldDataDescriptor.h"
+#include "tsAFExtensionsDescriptor.h"
 #include "tsAncillaryDataDescriptor.h"
+#include "tsAnnouncementSupportDescriptor.h"
 #include "tsApplicationDescriptor.h"
 #include "tsApplicationIconsDescriptor.h"
 #include "tsApplicationNameDescriptor.h"
@@ -133,6 +135,8 @@
 #include "tsExtendedEventDescriptor.h"
 #include "tsExternalApplicationAuthorizationDescriptor.h"
 #include "tsExternalESIdDescriptor.h"
+#include "tsFlexMuxTimingDescriptor.h"
+#include "tsFMCDescriptor.h"
 #include "tsFrequencyListDescriptor.h"
 #include "tsFTAContentManagementDescriptor.h"
 #include "tsGenreDescriptor.h"
@@ -142,6 +146,7 @@
 #include "tsHEVCVideoDescriptor.h"
 #include "tsHierarchyDescriptor.h"
 #include "tsIBPDescriptor.h"
+#include "tsImageIconDescriptor.h"
 #include "tsIPMACGenericStreamLocationDescriptor.h"
 #include "tsIPMACPlatformNameDescriptor.h"
 #include "tsIPMACPlatformProviderNameDescriptor.h"
@@ -154,13 +159,18 @@
 #include "tsLogicalChannelNumberDescriptor.h"
 #include "tsMaximumBitrateDescriptor.h"
 #include "tsMessageDescriptor.h"
+#include "tsMetadataSTDDescriptor.h"
+#include "tsMosaicDescriptor.h"
+#include "tsMPEG2AACAudioDescriptor.h"
 #include "tsMPEG4AudioDescriptor.h"
 #include "tsMPEG4VideoDescriptor.h"
 #include "tsMultilingualBouquetNameDescriptor.h"
 #include "tsMultilingualComponentDescriptor.h"
 #include "tsMultilingualNetworkNameDescriptor.h"
 #include "tsMultilingualServiceNameDescriptor.h"
+#include "tsMultiplexBufferDescriptor.h"
 #include "tsMultiplexBufferUtilizationDescriptor.h"
+#include "tsMVCExtensionDescriptor.h"
 #include "tsNetworkChangeNotifyDescriptor.h"
 #include "tsNetworkNameDescriptor.h"
 #include "tsNorDigLogicalChannelDescriptorV1.h"
@@ -208,6 +218,7 @@
 #include "tsStreamModeDescriptor.h"
 #include "tsSubtitlingDescriptor.h"
 #include "tsSupplementaryAudioDescriptor.h"
+#include "tsSVCExtensionDescriptor.h"
 #include "tsSystemClockDescriptor.h"
 #include "tsT2DeliverySystemDescriptor.h"
 #include "tsT2MIDescriptor.h"
@@ -220,8 +231,11 @@
 #include "tsTargetIPv6SourceSlashDescriptor.h"
 #include "tsTargetMACAddressDescriptor.h"
 #include "tsTargetMACAddressRangeDescriptor.h"
+#include "tsTargetRegionDescriptor.h"
+#include "tsTargetRegionNameDescriptor.h"
 #include "tsTargetSerialNumberDescriptor.h"
 #include "tsTargetSmartcardDescriptor.h"
+#include "tsTelephoneDescriptor.h"
 #include "tsTeletextDescriptor.h"
 #include "tsTerrestrialDeliverySystemDescriptor.h"
 #include "tsTimeShiftedEventDescriptor.h"

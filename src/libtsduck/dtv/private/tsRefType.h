@@ -28,7 +28,9 @@
 
     REF_TYPE(AACDescriptor);
     REF_TYPE(AdaptationFieldDataDescriptor);
+    REF_TYPE(AFExtensionsDescriptor);
     REF_TYPE(AncillaryDataDescriptor);
+    REF_TYPE(AnnouncementSupportDescriptor);
     REF_TYPE(ApplicationDescriptor);
     REF_TYPE(ApplicationIconsDescriptor);
     REF_TYPE(ApplicationNameDescriptor);
@@ -99,6 +101,8 @@
     REF_TYPE(ExtendedEventDescriptor);
     REF_TYPE(ExternalApplicationAuthorizationDescriptor);
     REF_TYPE(ExternalESIdDescriptor);
+    REF_TYPE(FlexMuxTimingDescriptor);
+    REF_TYPE(FMCDescriptor);
     REF_TYPE(FrequencyListDescriptor);
     REF_TYPE(FTAContentManagementDescriptor);
     REF_TYPE(GenreDescriptor);
@@ -108,6 +112,7 @@
     REF_TYPE(HEVCVideoDescriptor);
     REF_TYPE(HierarchyDescriptor);
     REF_TYPE(IBPDescriptor);
+    REF_TYPE(ImageIconDescriptor);
     REF_TYPE(IPMACGenericStreamLocationDescriptor);
     REF_TYPE(IPMACPlatformNameDescriptor);
     REF_TYPE(IPMACPlatformProviderNameDescriptor);
@@ -120,13 +125,18 @@
     REF_TYPE(LogicalChannelNumberDescriptor);
     REF_TYPE(MaximumBitrateDescriptor);
     REF_TYPE(MessageDescriptor);
+    REF_TYPE(MetadataSTDDescriptor);
+    REF_TYPE(MosaicDescriptor);
+    REF_TYPE(MPEG2AACAudioDescriptor);
     REF_TYPE(MPEG4AudioDescriptor);
     REF_TYPE(MPEG4VideoDescriptor);
     REF_TYPE(MultilingualBouquetNameDescriptor);
     REF_TYPE(MultilingualComponentDescriptor);
     REF_TYPE(MultilingualNetworkNameDescriptor);
     REF_TYPE(MultilingualServiceNameDescriptor);
+    REF_TYPE(MultiplexBufferDescriptor);
     REF_TYPE(MultiplexBufferUtilizationDescriptor);
+    REF_TYPE(MVCExtensionDescriptor);
     REF_TYPE(NetworkChangeNotifyDescriptor);
     REF_TYPE(NetworkNameDescriptor);
     REF_TYPE(NorDigLogicalChannelDescriptorV1);
@@ -174,6 +184,7 @@
     REF_TYPE(StreamModeDescriptor);
     REF_TYPE(SubtitlingDescriptor);
     REF_TYPE(SupplementaryAudioDescriptor);
+    REF_TYPE(SVCExtensionDescriptor);
     REF_TYPE(SystemClockDescriptor);
     REF_TYPE(T2DeliverySystemDescriptor);
     REF_TYPE(T2MIDescriptor);
@@ -186,8 +197,11 @@
     REF_TYPE(TargetIPv6SourceSlashDescriptor);
     REF_TYPE(TargetMACAddressDescriptor);
     REF_TYPE(TargetMACAddressRangeDescriptor);
+    REF_TYPE(TargetRegionDescriptor);
+    REF_TYPE(TargetRegionNameDescriptor);
     REF_TYPE(TargetSerialNumberDescriptor);
     REF_TYPE(TargetSmartcardDescriptor);
+    REF_TYPE(TelephoneDescriptor);
     REF_TYPE(TeletextDescriptor);
     REF_TYPE(TerrestrialDeliverySystemDescriptor);
     REF_TYPE(TimeShiftedEventDescriptor);

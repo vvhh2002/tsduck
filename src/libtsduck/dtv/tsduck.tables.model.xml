@@ -2,7 +2,7 @@
 <!--
 
  TSDuck - The MPEG Transport Stream Toolkit
- Copyright (c) 2005-2019, Thierry Lelegard
+ Copyright (c) 2005-2020, Thierry Lelegard
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -620,7 +620,20 @@
 
     <adaptation_field_data_descriptor adaptation_field_data_identifier="uint8, required"/>
 
+    <af_extensions_descriptor/>
+
     <ancillary_data_descriptor ancillary_data_identifier="uint8, required"/>
+
+    <announcement_support_descriptor>
+      <!-- One per announcement type -->
+      <announcement
+          announcement_type="uint4, required"
+          reference_type="uint3, required"
+          original_network_id="uint16, optional"
+          transport_stream_id="uint16, optional"
+          service_id="uint16, optional"
+          component_tag="uint8, optional"/>
+    </announcement_support_descriptor>
 
     <application_descriptor
         service_bound="bool, required"
@@ -1209,6 +1222,17 @@
 
     <external_ES_ID_descriptor external_ES_ID="uint16, required"/>
 
+    <flexmux_timing_descriptor
+        FCR_ES_ID="uint16, required"
+        FCRResolution="uint32, required"
+        FCRLength="uint8, required"
+        FmxRateLength="uint8, required"/>
+
+    <FMC_descriptor>
+      <!-- One per  SL_packetized stream -->
+      <stream ES_ID="uint16, required" FlexMuxChannel="uint8, required"/>
+    </FMC_descriptor>
+
     <FTA_content_management_descriptor
         user_defined="bool, required"
         do_not_scramble="bool, required"
@@ -1283,6 +1307,21 @@
         closed_gop="bool, required"
         identical_gop="bool, required"
         max_gop_length="uint14, required"/>
+
+    <image_icon_descriptor
+        descriptor_number="uint4, required"
+        last_descriptor_number="uint4, required"
+        icon_id="uint3, required"
+        icon_transport_mode="uint2, optional"
+        coordinate_system="uint3, optional"
+        icon_horizontal_origin="uint12, optional"
+        icon_vertical_origin="uint12, optional"
+        icon_type="string, optional"
+        url="string, optional">
+      <icon_data>
+        Hexadecimal content
+      </icon_data>
+    </image_icon_descriptor>
 
     <IPMAC_generic_stream_location_descriptor
         interactive_network_id="uint16, required"
@@ -1382,10 +1421,38 @@
 
     <maximum_bitrate_descriptor maximum_bitrate="uint32, in bits/second, required"/>
 
+    <metadata_STD_descriptor
+        metadata_input_leak_rate="uint22, required"
+        metadata_buffer_size="uint22, required"
+        metadata_output_leak_rate="uint22, required"/>
+
     <message_descriptor message_id="uint8, required"
                         language_code="char3, required">
       <text>String</text>
     </message_descriptor>
+
+    <mosaic_descriptor
+        mosaic_entry_point="bool, required"
+        number_of_horizontal_elementary_cells="uint3, required"
+        number_of_vertical_elementary_cells="uint3, required">
+      <!-- One per cell in the mosaic -->
+      <cell logical_cell_id="uint6, required"
+            logical_cell_presentation_info="uint3, required"
+            cell_linkage_info="uint8, required"
+            bouquet_id="uint16, optional"
+            original_network_id="uint16, optional"
+            transport_stream_id="uint16, optional"
+            service_id="uint16, optional"
+            event_id="uint16, optional">
+        <!-- One per elementary cell -->
+        <elementary_cell id="uint6, required"/>
+      </cell>
+    </mosaic_descriptor>
+
+    <MPEG2_AAC_audio_descriptor
+        MPEG2_AAC_profile="uint8, required"
+        MPEG2_AAC_channel_configuration="uint8, required"
+        MPEG2_AAC_additional_information="uint8, required"/>
 
     <MPEG4_audio_descriptor MPEG4_audio_profile_and_level="uint8, required"/>
 
@@ -1413,9 +1480,25 @@
                 service_name="string, required"/>
     </multilingual_service_name_descriptor>
 
+    <multiplex_buffer_descriptor
+        MB_buffer_size="uint24, required"
+        TB_leak_rate="uint24, required"/>
+
     <multiplex_buffer_utilization_descriptor
         LTW_offset_lower_bound="uint15, optional"
         LTW_offset_upper_bound="uint15, optional"/>
+
+    <MVC_extension_descriptor
+        average_bitrate="uint16, required"
+        maximum_bitrate="uint16, required"
+        view_association_not_present="bool, required"
+        base_view_is_left_eyeview="bool, required"
+        view_order_index_min="uint10, required"
+        view_order_index_max="uint10, required"
+        temporal_id_start="uint3, required"
+        temporal_id_end="uint3, required"
+        no_sei_nal_unit_present="bool, required"
+        no_prefix_nal_unit_present="bool, required"/>
 
     <network_change_notify_descriptor>
       <!-- One per cell -->
@@ -1742,6 +1825,19 @@
       </private_data>
     </supplementary_audio_descriptor>
 
+    <SVC_extension_descriptor
+        width="uint16, required"
+        height="uint16, required"
+        frame_rate="uint16, required"
+        average_bitrate="uint16, required"
+        maximum_bitrate="uint16, required"
+        dependency_id="uint3, required"
+        quality_id_start="uint4, required"
+        quality_id_end="uint4, required"
+        temporal_id_start="uint3, required"
+        temporal_id_end="uint3, required"
+        no_sei_nal_unit_present="bool, required"/>
+
     <system_clock_descriptor
         external_clock_reference="bool required"
         clock_accuracy_integer="uint6, required"
@@ -1818,10 +1914,27 @@
     <target_MAC_address_range_descriptor>
       <!-- Must be in an INT (table id 0x4C) -->
       <!-- One per MAC address range: -->
-      <range
-          MAC_addr_low="MAC address, required"
-          MAC_addr_high="MAC address, required"/>
+      <range MAC_addr_low="MAC address, required"
+             MAC_addr_high="MAC address, required"/>
     </target_MAC_address_range_descriptor>
+
+    <target_region_descriptor country_code="char3, required">
+      <!-- One per region -->
+      <region country_code="char3, optional"
+              primary_region_code="uint8, optional"
+              secondary_region_code="uint8, optional"
+              tertiary_region_code="uint16, optional"/>
+    </target_region_descriptor>
+
+    <target_region_name_descriptor
+        country_code="char3, required"
+        ISO_639_language_code="char3, required">
+      <!-- One per region -->
+      <region region_name="string, required"
+              primary_region_code="uint8, required"
+              secondary_region_code="uint8, optional"
+              tertiary_region_code="uint16, optional"/>
+    </target_region_name_descriptor>
 
     <target_serial_number_descriptor>
       <!-- Serial data bytes -->
@@ -1832,6 +1945,15 @@
       <!-- Private data bytes -->
       Hexadecimal content
     </target_smartcard_descriptor>
+
+    <telephone_descriptor
+        foreign_availability="bool, required"
+        connection_type="uint5, required"
+        country_prefix="string, 3 chars max, optional"
+        international_area_code="string, 7 chars max, optional"
+        operator_code="string, 3 chars max, optional"
+        national_area_code="string, 7 chars max, optional"
+        core_number="string, 15 chars max, optional"/>
 
     <teletext_descriptor>
       <!-- One per page -->
