@@ -26,10 +26,6 @@
 //  THE POSSIBILITY OF SUCH DAMAGE.
 //
 //----------------------------------------------------------------------------
-//
-//  Command line arguments to display PSI/SI tables.
-//
-//----------------------------------------------------------------------------
 
 #include "tsPagerArgs.h"
 #include "tsNullReport.h"

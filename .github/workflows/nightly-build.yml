@@ -1,0 +1,91 @@
+#-----------------------------------------------------------------------------
+#
+#  TSDuck - The MPEG Transport Stream Toolkit
+#  Copyright (c) 2005-2020, Thierry Lelegard
+#  All rights reserved.
+#
+#  Redistribution and use in source and binary forms, with or without
+#  modification, are permitted provided that the following conditions are met:
+#
+#  1. Redistributions of source code must retain the above copyright notice,
+#     this list of conditions and the following disclaimer.
+#  2. Redistributions in binary form must reproduce the above copyright
+#     notice, this list of conditions and the following disclaimer in the
+#     documentation and/or other materials provided with the distribution.
+#
+#  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+#  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+#  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+#  ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+#  LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+#  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+#  SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+#  INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+#  CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+#  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+#  THE POSSIBILITY OF SUCH DAMAGE.
+#
+#-----------------------------------------------------------------------------
+#
+#  GitHub Actions configuration file : Nightly builds
+#
+#-----------------------------------------------------------------------------
+
+name: Nightly build
+
+# Trigger the workflow every day at 01:10 GMT
+on:
+  schedule:
+    - cron:  '10 1 * * *'
+
+# We currently build on Windows only. If is easy for users to rebuild on Unix.
+jobs:
+  windows:
+    name: Windows build
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@master
+    - name: Install NSIS
+      run: build/install-nsis.ps1 -NoPause
+    - name: Install libsrt
+      run: build/install-libsrt.ps1 -GitHubActions -NoPause
+    - name: Install Dektec SDK
+      run: dektec/Download-Install-Dtapi.ps1 -NoPause
+    - name: Build installers
+      run: |
+        Get-Date
+        build/Build-Installer.ps1 -NoPause -NoLowPriority -NoSource
+        $version = (Get-ChildItem -Recurse -Path installers -Include "TSDuck-Win64-*.exe" | `
+          ForEach-Object { $_.Name -replace 'TSDuck-Win64-','' -replace '.exe','' } | `
+          Select-Object -Last 1)
+        $version | Out-File version.txt
+        Write-Output "::set-env name=VERSION::$version"
+    - name: Check built version (64-bit)
+      run: build/msvc/Release-x64/tsversion.exe --version=all
+    - name: Check built version (32-bit)
+      run: build/msvc/Release-Win32/tsversion.exe --version=all
+    - name: Upload version
+      uses: actions/upload-artifact@master
+      with:
+        name: version
+        path: version.txt
+    - name: Upload 64-bit installer
+      uses: actions/upload-artifact@master
+      with:
+        name: installer-64
+        path: installers/TSDuck-Win64-${{ env.VERSION }}.exe
+    - name: Upload 64-bit portable
+      uses: actions/upload-artifact@master
+      with:
+        name: portable-64
+        path: installers/TSDuck-Win64-${{ env.VERSION }}-Portable.zip
+    - name: Upload 32-bit installer
+      uses: actions/upload-artifact@master
+      with:
+        name: installer-32
+        path: installers/TSDuck-Win32-${{ env.VERSION }}.exe
+    - name: Upload 32-bit portable
+      uses: actions/upload-artifact@master
+      with:
+        name: portable-32
+        path: installers/TSDuck-Win32-${{ env.VERSION }}-Portable.zip

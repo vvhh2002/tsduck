@@ -35,6 +35,7 @@
 #  - NODTAPI : No Dektec support, remove dependency to DTAPI.
 #  - NOCURL  : No HTTP support, remove dependency to libcurl.
 #  - NOPCSC  : No smartcard support, remove dependency to pcsc-lite.
+#  - NOSRT   : No SRT support, remove dependency to libsrt.
 #  - NOTELETEXT : No Teletext support, remove teletext handling code.
 #
 #-----------------------------------------------------------------------------
